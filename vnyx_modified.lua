@@ -1,4 +1,5 @@
--- venyx ui lib, modified by myzsyn
+-- venyx ui lib, modified by myzsyn 
+-- much love <3, added btns mb fam
 -- init
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -187,7 +188,7 @@ function utility:DraggingEnabled(frame, parent)
 			if input == dragInput and dragging then
 				local delta = input.Position - mousePos
 				local targetPosition = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X,framePos.Y.Scale, framePos.Y.Offset + delta.Y)
-			    tween:Create(parent, TweenInfo.new(0.15, Enum.EasingStyle.Circular, Enum.EasingDirection.Out), { Position = targetPosition }):Play() -- erm sigma
+			    tween:Create(parent, TweenInfo.new(0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out), { Position = targetPosition }):Play() -- erm sigma
 			end
 		end)
 
@@ -680,6 +681,66 @@ do
 		end)
 	end
 end
+
+	function section:addButton(title, callback)
+		local button = utility:Create("ImageButton", {
+			Name = "Button",
+			Parent = self.container,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 0, 30),
+			ZIndex = 2,
+			Image = "rbxassetid://5028857472",
+			ImageColor3 = themes.DarkContrast,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(2, 2, 298, 298)
+		}, {
+			utility:Create("TextLabel", {
+				Name = "Title",
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 3,
+				Font = Enum.Font.Gotham,
+				Text = title,
+				TextColor3 = themes.TextColor,
+				TextSize = 12,
+				TextTransparency = 0.10000000149012
+			})
+		})
+		
+		table.insert(self.modules, button)
+		--self:Resize()
+		
+		local text = button.Title
+		local debounce
+		
+		button.MouseButton1Click:Connect(function()
+			
+			if debounce then
+				return
+			end
+			
+			-- animation
+			utility:Pop(button, 10)
+			
+			debounce = true
+			text.TextSize = 0
+			utility:Tween(button.Title, {TextSize = 14}, 0.2)
+			
+			wait(0.2)
+			utility:Tween(button.Title, {TextSize = 12}, 0.2)
+			
+			if callback then
+				callback(function(...)
+					self:updateButton(button, ...)
+				end)
+			end
+			
+			debounce = false
+		end)
+		
+		return button
+	end
 	
 	function section:addToggle(title, default, callback)
 		local toggle = utility:Create("ImageButton", {
