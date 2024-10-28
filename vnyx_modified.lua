@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, testng tween stuff
+-- much love <3, testimng.
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -14,6 +14,7 @@ local player = players.LocalPlayer
 local mouse = player:GetMouse()
 
 -- services
+local coregui = GetProtectedService("CoreGui")
 local input = GetProtectedService("UserInputService")
 local run = GetProtectedService("RunService")
 local tween = GetProtectedService("TweenService")
@@ -34,6 +35,11 @@ local themes = {
 	DarkContrast = Color3.fromRGB(14, 14, 14),  
 	TextColor = Color3.fromRGB(255, 255, 255)
 }
+
+local NotificationSound = Instance.new("Sound", coregui)
+NotificationSound.SoundId = "rbxassetid://6647897822"
+NotificationSound.Volume = 1
+NotificationSound.Name = "NotifySound"
 
 do
 	function utility:Create(instance, properties, children)
@@ -223,212 +229,102 @@ do
 	-- new classes
 	
 	function library.new(title)
-		local container = utility:Create("ScreenGui", {
-			Name = title,
-			Parent = game.CoreGui
+	local container = utility:Create("ScreenGui", {
+		Name = title,
+		Parent = game.CoreGui
+	}, {
+		utility:Create("ImageLabel", {
+			Name = "Main",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.25, 0, 0.052435593, 0),
+			Size = UDim2.new(0, 511, 0, 428),
+			Image = "rbxassetid://4641149554",
+			ImageColor3 = themes.Background,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(4, 4, 296, 296)
 		}, {
+			utility:Create("UIGradient", { -- Adding UIGradient
+				Color = ColorSequence.new{
+					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),  -- Start color (e.g., Red)
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))   -- End color (e.g., Blue)
+				},
+				Rotation = 45 -- Adjust as needed
+			}),
 			utility:Create("ImageLabel", {
-				Name = "Main",
+				Name = "Glow",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0.25, 0, 0.052435593, 0),
-				Size = UDim2.new(0, 511, 0, 428),
-				Image = "rbxassetid://4641149554",
-				ImageColor3 = themes.Background,
+				Position = UDim2.new(0, -15, 0, -15),
+				Size = UDim2.new(1, 30, 1, 30),
+				ZIndex = 0,
+				Image = "rbxassetid://5028857084",
+				ImageColor3 = themes.Glow,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(24, 24, 276, 276)
+			}),
+			utility:Create("ImageLabel", {
+				Name = "Pages",
+				BackgroundTransparency = 1,
+				ClipsDescendants = true,
+				Position = UDim2.new(0, 0, 0, 38),
+				Size = UDim2.new(0, 126, 1, -38),
+				ZIndex = 3,
+				Image = "rbxassetid://5012534273",
+				ImageColor3 = themes.DarkContrast,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(4, 4, 296, 296)
 			}, {
-				utility:Create("ImageLabel", {
-					Name = "Glow",
+				utility:Create("ScrollingFrame", {
+					Name = "Pages_Container",
+					Active = true,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, -15, 0, -15),
-					Size = UDim2.new(1, 30, 1, 30),
-					ZIndex = 0,
-					Image = "rbxassetid://5028857084",
-					ImageColor3 = themes.Glow,
-					ScaleType = Enum.ScaleType.Slice,
-					SliceCenter = Rect.new(24, 24, 276, 276)
-				}),
-				utility:Create("ImageLabel", {
-					Name = "Pages",
-					BackgroundTransparency = 1,
-					ClipsDescendants = true,
-					Position = UDim2.new(0, 0, 0, 38),
-					Size = UDim2.new(0, 126, 1, -38),
-					ZIndex = 3,
-					Image = "rbxassetid://5012534273",
-					ImageColor3 = themes.DarkContrast,
-					ScaleType = Enum.ScaleType.Slice,
-					SliceCenter = Rect.new(4, 4, 296, 296)
+					Position = UDim2.new(0, 0, 0, 10),
+					Size = UDim2.new(1, 0, 1, -20),
+					CanvasSize = UDim2.new(0, 0, 0, 314),
+					ScrollBarThickness = 0
 				}, {
-					utility:Create("ScrollingFrame", {
-						Name = "Pages_Container",
-						Active = true,
-						BackgroundTransparency = 1,
-						Position = UDim2.new(0, 0, 0, 10),
-						Size = UDim2.new(1, 0, 1, -20),
-						CanvasSize = UDim2.new(0, 0, 0, 314),
-						ScrollBarThickness = 0
-					}, {
-						utility:Create("UIListLayout", {
-							SortOrder = Enum.SortOrder.LayoutOrder,
-							Padding = UDim.new(0, 10)
-						})
-					})
-				}),
-				utility:Create("ImageLabel", {
-					Name = "TopBar",
-					BackgroundTransparency = 1,
-					ClipsDescendants = true,
-					Size = UDim2.new(1, 0, 0, 38),
-					ZIndex = 5,
-					Image = "rbxassetid://4595286933",
-					ImageColor3 = themes.Accent,
-					ScaleType = Enum.ScaleType.Slice,
-					SliceCenter = Rect.new(4, 4, 296, 296)
-				}, {
-					utility:Create("TextLabel", { -- title
-						Name = "Title",
-						AnchorPoint = Vector2.new(0, 0.5),
-						BackgroundTransparency = 1,
-						Position = UDim2.new(0, 12, 0, 19),
-						Size = UDim2.new(1, -46, 0, 16),
-						ZIndex = 5,
-						Font = Enum.Font.GothamBold,
-						Text = title,
-						TextColor3 = themes.TextColor,
-						TextSize = 14,
-						TextXAlignment = Enum.TextXAlignment.Left
+					utility:Create("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 10)
 					})
 				})
-			})
-		})
-		
-		utility:InitializeKeybind()
-		utility:DraggingEnabled(container.Main.TopBar, container.Main)
-		
-		return setmetatable({
-			container = container,
-			pagesContainer = container.Main.Pages.Pages_Container,
-			pages = {}
-		}, library)
-	end
-	
-	function page.new(library, title, icon)
-		local button = utility:Create("TextButton", {
-			Name = title,
-			Parent = library.pagesContainer,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, 26),
-			ZIndex = 3,
-			AutoButtonColor = false,
-			Font = Enum.Font.Gotham,
-			Text = "",
-			TextSize = 14
-		}, {
-			utility:Create("TextLabel", {
-				Name = "Title",
-				AnchorPoint = Vector2.new(0, 0.5),
-				BackgroundTransparency = 1,
-				Position = UDim2.new(0, 40, 0.5, 0),
-				Size = UDim2.new(0, 76, 1, 0),
-				ZIndex = 3,
-				Font = Enum.Font.Gotham,
-				Text = title,
-				TextColor3 = themes.TextColor,
-				TextSize = 12,
-				TextTransparency = 0.65,
-				TextXAlignment = Enum.TextXAlignment.Left
 			}),
-			icon and utility:Create("ImageLabel", {
-				Name = "Icon", 
-				AnchorPoint = Vector2.new(0, 0.5),
+			utility:Create("ImageLabel", {
+				Name = "TopBar",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0, 12, 0.5, 0),
-				Size = UDim2.new(0, 16, 0, 16),
-				ZIndex = 3,
-				Image = "rbxassetid://" .. tostring(icon),
-				ImageColor3 = themes.TextColor,
-				ImageTransparency = 0.64
-			}) or {}
-		})
-		
-		local container = utility:Create("ScrollingFrame", {
-			Name = title,
-			Parent = library.container.Main,
-			Active = true,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Position = UDim2.new(0, 134, 0, 46),
-			Size = UDim2.new(1, -142, 1, -56),
-			CanvasSize = UDim2.new(0, 0, 0, 466),
-			ScrollBarThickness = 3,
-			ScrollBarImageColor3 = themes.DarkContrast,
-			Visible = false
-		}, {
-			utility:Create("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 10)
-			})
-		})
-		
-		return setmetatable({
-			library = library,
-			container = container,
-			button = button,
-			sections = {}
-		}, page)
-	end
-	
-	function section.new(page, title)
-		local container = utility:Create("ImageLabel", {
-			Name = title,
-			Parent = page.container,
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -10, 0, 28),
-			ZIndex = 2,
-			Image = "rbxassetid://5028857472",
-			ImageColor3 = themes.LightContrast,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(4, 4, 296, 296),
-			ClipsDescendants = true
-		}, {
-			utility:Create("Frame", {
-				Name = "Container",
-				Active = true,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Position = UDim2.new(0, 8, 0, 8),
-				Size = UDim2.new(1, -16, 1, -16)
+				ClipsDescendants = true,
+				Size = UDim2.new(1, 0, 0, 38),
+				ZIndex = 5,
+				Image = "rbxassetid://4595286933",
+				ImageColor3 = themes.Accent,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(4, 4, 296, 296)
 			}, {
-				utility:Create("TextLabel", {
+				utility:Create("TextLabel", { -- title
 					Name = "Title",
+					AnchorPoint = Vector2.new(0, 0.5),
 					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, 20),
-					ZIndex = 2,
-					Font = Enum.Font.GothamSemibold,
+					Position = UDim2.new(0, 12, 0, 19),
+					Size = UDim2.new(1, -46, 0, 16),
+					ZIndex = 5,
+					Font = Enum.Font.GothamBold,
 					Text = title,
 					TextColor3 = themes.TextColor,
-					TextSize = 12,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextTransparency = 1
-				}),
-				utility:Create("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 4)
+					TextSize = 14,
+					TextXAlignment = Enum.TextXAlignment.Left
 				})
 			})
 		})
-		
-		return setmetatable({
-			page = page,
-			container = container.Container,
-			colorpickers = {},
-			modules = {},
-			binds = {},
-			lists = {},
-		}, section) 
-	end
+	})
+	
+	utility:InitializeKeybind()
+	utility:DraggingEnabled(container.Main.TopBar, container.Main)
+	
+	return setmetatable({
+		container = container,
+		pagesContainer = container.Main.Pages.Pages_Container,
+		pages = {}
+	}, library)
+end
 	
 	function library:addPage(...)
 	
@@ -516,6 +412,8 @@ do
 	if self.activeNotification then
 		self.activeNotification = self.activeNotification()
 	end
+
+	NotificationSound:Play()
 	
 	local showButtons = not duration or duration <= 0 or callback ~= nil
 	
