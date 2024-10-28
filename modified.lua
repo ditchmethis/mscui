@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, sounds.
+-- much love <3, changed notify sound.
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -37,7 +37,7 @@ local themes = {
 }
 
 local NotificationSound = Instance.new("Sound", coregui)
-NotificationSound.SoundId = "rbxassetid://17592799196"
+NotificationSound.SoundId = "rbxassetid://6647897822"
 NotificationSound.Volume = 1
 NotificationSound.Name = "NotifySound"
 
