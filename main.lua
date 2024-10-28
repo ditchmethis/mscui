@@ -1,4 +1,4 @@
--- venyx ui lib reuploaded by me
+-- venyx ui lib, modified by myzsyn
 -- init
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -97,7 +97,7 @@ do
 		utility:Tween(clone, {Size = object.Size}, 0.2)
 		
 		spawn(function()
-			wait(0.2)
+			task.wait(0.2)
 		
 			object.ImageTransparency = 0
 			clone:Destroy()
@@ -151,16 +151,15 @@ do
 			key = input.InputBegan:Wait()
 		end
 		
-		wait() -- overlapping connection
+		task.wait() -- overlapping connection
 		
 		return key
 	end
 	
-	function utility:DraggingEnabled(frame, parent)
+function utility:DraggingEnabled(frame, parent)
 	
 		parent = parent or frame
 		
-		-- stolen from wally or kiriot, kek
 		local dragging = false
 		local dragInput, mousePos, framePos
 
@@ -187,7 +186,8 @@ do
 		input.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
 				local delta = input.Position - mousePos
-				parent.Position  = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+				local targetPosition = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X,framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+			    tween:Create(parent, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), { Position = targetPosition }):Play() -- erm sigma
 			end
 		end)
 
@@ -474,10 +474,10 @@ do
 				Size = UDim2.new(0, 511, 0, 428),
 				Position = self.position
 			}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 			
 			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 			
 			container.ClipsDescendants = false
 			self.position = nil
@@ -486,13 +486,13 @@ do
 			container.ClipsDescendants = true
 			
 			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 			
 			utility:Tween(container, {
 				Size = UDim2.new(0, 511, 0, 0),
 				Position = self.position + UDim2.new(0, 0, 0, 428)
 			}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 		end
 		
 		self.toggling = false
@@ -507,19 +507,11 @@ do
 		self.activeNotification = self.activeNotification()
 	end
 	
-	-- standard create
-	local notification = utility:Create("ImageLabel", {
-		Name = "Notification",
-		Parent = self.container,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, 200, 0, 60),
-		Image = "rbxassetid://5028857472",
-		ImageColor3 = themes.Background,
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(4, 4, 296, 296),
-		ZIndex = 3,
-		ClipsDescendants = true
-	}, {
+	-- Determine if buttons should be created
+	local showButtons = not duration or duration <= 0 or callback ~= nil
+	
+	-- Create notification UI
+	local notificationElements = {
 		utility:Create("ImageLabel", {
 			Name = "Flash",
 			Size = UDim2.new(1, 0, 1, 0),
@@ -560,8 +552,12 @@ do
 			TextColor3 = themes.TextColor,
 			TextSize = 12.000,
 			TextXAlignment = Enum.TextXAlignment.Left
-		}),
-		utility:Create("ImageButton", {
+		})
+	}
+
+	-- Conditionally add buttons if needed
+	if showButtons then
+		table.insert(notificationElements, utility:Create("ImageButton", {
 			Name = "Accept",
 			BackgroundTransparency = 1,
 			Position = UDim2.new(1, -26, 0, 8),
@@ -569,8 +565,8 @@ do
 			Image = "rbxassetid://5012538259",
 			ImageColor3 = themes.TextColor,
 			ZIndex = 4
-		}),
-		utility:Create("ImageButton", {
+		}))
+		table.insert(notificationElements, utility:Create("ImageButton", {
 			Name = "Decline",
 			BackgroundTransparency = 1,
 			Position = UDim2.new(1, -26, 1, -24),
@@ -578,8 +574,21 @@ do
 			Image = "rbxassetid://5012538583",
 			ImageColor3 = themes.TextColor,
 			ZIndex = 4
-		})
-	})
+		}))
+	end
+
+	local notification = utility:Create("ImageLabel", {
+		Name = "Notification",
+		Parent = self.container,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 200, 0, 60),
+		Image = "rbxassetid://5028857472",
+		ImageColor3 = themes.Background,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(4, 4, 296, 296),
+		ZIndex = 3,
+		ClipsDescendants = true
+	}, notificationElements)
 	
 	-- dragging
 	utility:DraggingEnabled(notification)
@@ -592,13 +601,17 @@ do
 	notification.Text.Text = text
 	
 	local padding = 10
-	local textSize = game:GetService("TextService"):GetTextSize(text, 12, Enum.Font.Gotham, Vector2.new(math.huge, 16))
+	local textService = game:GetService("TextService")
+	local titleSize = textService:GetTextSize(title, 14, Enum.Font.GothamSemibold, Vector2.new(math.huge, 16))
+	local textSize = textService:GetTextSize(text, 12, Enum.Font.Gotham, Vector2.new(math.huge, 16))
 	
+	-- Set notification width based on the longest text between title and description
+	local maxTextWidth = math.max(titleSize.X, textSize.X)
 	notification.Position = library.lastNotification or UDim2.new(0, padding, 1, -(notification.AbsoluteSize.Y + padding))
 	notification.Size = UDim2.new(0, 0, 0, 60)
 	
-	utility:Tween(notification, {Size = UDim2.new(0, textSize.X + 70, 0, 60)}, 0.2)
-	wait(0.2)
+	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2)
+	task.wait(0.2)
 	
 	notification.ClipsDescendants = false
 	utility:Tween(notification.Flash, {
@@ -620,13 +633,13 @@ do
 		notification.Flash.Position = UDim2.new(0, 0, 0, 0)
 		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
 		
-		wait(0.2)
+		task.wait(0.2)
 		utility:Tween(notification, {
 			Size = UDim2.new(0, 0, 0, 60),
-			Position = notification.Position + UDim2.new(0, textSize.X + 70, 0, 0)
+			Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)
 		}, 0.2)
 		
-		wait(0.2)
+		task.wait(0.2)
 		notification:Destroy()
 	end
 	
@@ -641,29 +654,31 @@ do
 		end)
 	end
 	
-	notification.Accept.MouseButton1Click:Connect(function()
-		if not active then 
-			return
-		end
+	if showButtons then
+		notification.Accept.MouseButton1Click:Connect(function()
+			if not active then 
+				return
+			end
+			
+			if callback then
+				callback(true)
+			end
+			
+			close()
+		end)
 		
-		if callback then
-			callback(true)
-		end
-		
-		close()
-	end)
-	
-	notification.Decline.MouseButton1Click:Connect(function()
-		if not active then 
-			return
-		end
-		
-		if callback then
-			callback(false)
-		end
-		
-		close()
-	end)
+		notification.Decline.MouseButton1Click:Connect(function()
+			if not active then 
+				return
+			end
+			
+			if callback then
+				callback(false)
+			end
+			
+			close()
+		end)
+	end
 end
 	
 	function section:addToggle(title, default, callback)
@@ -809,7 +824,7 @@ end
 				Position = UDim2.new(1, -210, 0.5, -8)
 			}, 0.2)
 			
-			wait()
+			task.wait()
 
 			input.TextXAlignment = Enum.TextXAlignment.Left
 			input:CaptureFocus()
@@ -1441,7 +1456,7 @@ end
 				utility:Tween(tab, {Size = UDim2.new(0, 162, 0, 169)}, 0.2)
 				
 				-- update size and position
-				wait(0.2)
+				task.wait(0.2)
 				tab.ClipsDescendants = false
 				
 				canvasSize, canvasPosition = canvas.AbsoluteSize, canvas.AbsolutePosition
@@ -1450,7 +1465,7 @@ end
 				utility:Tween(tab, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
 				tab.ClipsDescendants = true
 				
-				wait(0.2)
+				task.wait(0.2)
 				tab.Visible = false
 			end
 			
@@ -1602,7 +1617,7 @@ end
 				utility:Wait()
 			end
 			
-			wait(0.5)
+			task.wait(0.5)
 			utility:Tween(circle, {ImageTransparency = 1}, 0.2)
 		end)
 		
@@ -1798,7 +1813,7 @@ end
 				end
 			end
 			
-			wait(0.1)
+			task.wait(0.1)
 			page.container.Visible = true
 			
 			if focusedPage then
@@ -1814,17 +1829,17 @@ end
 				end
 			end
 			
-			wait(0.05)
+			task.wait(0.05)
 			
 			for i, section in pairs(page.sections) do
 			
 				utility:Tween(section.container.Title, {TextTransparency = 0}, 0.1)
 				section:Resize(true)
 				
-				wait(0.05)
+				task.wait(0.05)
 			end
 			
-			wait(0.05)
+			task.wait(0.05)
 			page:Resize(true)
 		else
 			-- page button
@@ -1841,7 +1856,7 @@ end
 				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.1)
 			end
 			
-			wait(0.1)
+			task.wait(0.1)
 			
 			page.lastPosition = page.container.CanvasPosition.Y
 			page:Resize()
@@ -1928,7 +1943,7 @@ end
 			Position = position[value] + UDim2.new(0, 0, 0, 2.5)
 		}, 0.2)
 		
-		wait(0.1)
+		task.wait(0.1)
 		utility:Tween(frame, {
 			Size = UDim2.new(1, -22, 1, -4),
 			Position = position[value]
