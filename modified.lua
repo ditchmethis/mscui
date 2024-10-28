@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, testng tween stuff
+-- much love <3, sounds.
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -14,6 +14,7 @@ local player = players.LocalPlayer
 local mouse = player:GetMouse()
 
 -- services
+local coregui = GetProtectedService("CoreGui")
 local input = GetProtectedService("UserInputService")
 local run = GetProtectedService("RunService")
 local tween = GetProtectedService("TweenService")
@@ -34,6 +35,11 @@ local themes = {
 	DarkContrast = Color3.fromRGB(14, 14, 14),  
 	TextColor = Color3.fromRGB(255, 255, 255)
 }
+
+local NotificationSound = Instance.new("Sound", coregui)
+NotificationSound.SoundId = "rbxassetid://17592799196"
+NotificationSound.Volume = 1
+NotificationSound.Name = "NotifySound"
 
 do
 	function utility:Create(instance, properties, children)
@@ -516,6 +522,8 @@ do
 	if self.activeNotification then
 		self.activeNotification = self.activeNotification()
 	end
+
+	NotificationSound:Play()
 	
 	local showButtons = not duration or duration <= 0 or callback ~= nil
 	
