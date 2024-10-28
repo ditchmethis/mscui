@@ -1,13 +1,23 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, fixed notifications overlapping
--- init
-local player = game.Players.LocalPlayer
+-- much love <3, testng tween stuff
+
+local cloneref = cloneref or function(...) return ... end
+
+local GetProtectedService = setmetatable({}, {
+    __call = function(_, ServiceName)
+        return cloneref(game:GetService(ServiceName))
+    end
+})
+
+local players = GetProtectedService("Players")
+local player = players.LocalPlayer
 local mouse = player:GetMouse()
 
 -- services
-local input = game:GetService("UserInputService")
-local run = game:GetService("RunService")
-local tween = game:GetService("TweenService")
+local input = GetProtectedService("UserInputService")
+local run = GetProtectedService("RunService")
+local tween = GetProtectedService("TweenService")
+local textService = GetProtectedService("TextService")
 local tweeninfo = TweenInfo.new
 
 -- additional
@@ -15,6 +25,7 @@ local utility = {}
 
 -- themes
 local objects = {}
+
 local themes = {
 	Background = Color3.fromRGB(24, 24, 24), 
 	Glow = Color3.fromRGB(0, 0, 0), 
@@ -51,7 +62,7 @@ do
 	end
 	
 	function utility:Tween(instance, properties, duration, ...)
-		tween:Create(instance, tweeninfo(duration, ...), properties):Play()
+		tween:Create(instance, tweeninfo(duration, Enum.EasingStyle.Circular, Enum.EasingDirection.Out, ...), properties):Play()
 	end
 	
 	function utility:Wait()
@@ -98,7 +109,7 @@ do
 		utility:Tween(clone, {Size = object.Size}, 0.2)
 		
 		spawn(function()
-			wait(0.2)
+			task.wait(0.2)
 		
 			object.ImageTransparency = 0
 			clone:Destroy()
@@ -152,7 +163,7 @@ do
 			key = input.InputBegan:Wait()
 		end
 		
-		wait() -- overlapping connection
+		task.wait() -- overlapping connection
 		
 		return key
 	end
@@ -186,9 +197,7 @@ function utility:DraggingEnabled(frame, parent)
 
 		input.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				local delta = input.Position - mousePos
-				local targetPosition = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X,framePos.Y.Scale, framePos.Y.Offset + delta.Y)
-			    tween:Create(parent, TweenInfo.new(0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out), { Position = targetPosition }):Play() -- erm sigma
+				utility:Tween(parent, { Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y) }, 0.3)
 			end
 		end)
 
@@ -475,10 +484,10 @@ do
 				Size = UDim2.new(0, 511, 0, 428),
 				Position = self.position
 			}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 			
 			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 			
 			container.ClipsDescendants = false
 			self.position = nil
@@ -487,13 +496,13 @@ do
 			container.ClipsDescendants = true
 			
 			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 			
 			utility:Tween(container, {
 				Size = UDim2.new(0, 511, 0, 0),
 				Position = self.position + UDim2.new(0, 0, 0, 428)
 			}, 0.2)
-			wait(0.2)
+			task.wait(0.2)
 		end
 		
 		self.toggling = false
@@ -501,170 +510,181 @@ do
 	
 	-- new modules
 	
-	library.notificationQueue = library.notificationQueue or {}
-
 	function library:Notify(title, text, duration, callback)
-    local function displayNotification()
-        -- overwrite last notification
-        if self.activeNotification then
-            self.activeNotification = self.activeNotification()
-        end
+	
+	-- overwrite last notification
+	if self.activeNotification then
+		self.activeNotification = self.activeNotification()
+	end
+	
+	local showButtons = not duration or duration <= 0 or callback ~= nil
+	
+	local notificationElements = {
+		utility:Create("ImageLabel", {
+			Name = "Flash",
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			Image = "rbxassetid://4641149554",
+			ImageColor3 = themes.TextColor,
+			ZIndex = 5
+		}),
+		utility:Create("ImageLabel", {
+			Name = "Glow",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, -15, 0, -15),
+			Size = UDim2.new(1, 30, 1, 30),
+			ZIndex = 2,
+			Image = "rbxassetid://5028857084",
+			ImageColor3 = themes.Glow,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(24, 24, 276, 276)
+		}),
+		utility:Create("TextLabel", {
+			Name = "Title",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, 10, 0, 8),
+			Size = UDim2.new(1, -40, 0, 16),
+			ZIndex = 4,
+			Font = Enum.Font.GothamSemibold,
+			TextColor3 = themes.TextColor,
+			TextSize = 14.000,
+			TextXAlignment = Enum.TextXAlignment.Left
+		}),
+		utility:Create("TextLabel", {
+			Name = "Text",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, 10, 1, -24),
+			Size = UDim2.new(1, -40, 0, 16),
+			ZIndex = 4,
+			Font = Enum.Font.Gotham,
+			TextColor3 = themes.TextColor,
+			TextSize = 12.000,
+			TextXAlignment = Enum.TextXAlignment.Left
+		})
+	}
 
-        local showButtons = not duration or duration <= 0 or callback ~= nil
+	if showButtons then
+		table.insert(notificationElements, utility:Create("ImageButton", {
+			Name = "Accept",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(1, -26, 0, 8),
+			Size = UDim2.new(0, 16, 0, 16),
+			Image = "rbxassetid://5012538259",
+			ImageColor3 = themes.TextColor,
+			ZIndex = 4
+		}))
+		table.insert(notificationElements, utility:Create("ImageButton", {
+			Name = "Decline",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(1, -26, 1, -24),
+			Size = UDim2.new(0, 16, 0, 16),
+			Image = "rbxassetid://5012538583",
+			ImageColor3 = themes.TextColor,
+			ZIndex = 4
+		}))
+	end
 
-        local notificationElements = {
-            utility:Create("ImageLabel", {
-                Name = "Flash",
-                Size = UDim2.new(1, 0, 1, 0),
-                BackgroundTransparency = 1,
-                Image = "rbxassetid://4641149554",
-                ImageColor3 = themes.TextColor,
-                ZIndex = 5
-            }),
-            utility:Create("ImageLabel", {
-                Name = "Glow",
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, -15, 0, -15),
-                Size = UDim2.new(1, 30, 1, 30),
-                ZIndex = 2,
-                Image = "rbxassetid://5028857084",
-                ImageColor3 = themes.Glow,
-                ScaleType = Enum.ScaleType.Slice,
-                SliceCenter = Rect.new(24, 24, 276, 276)
-            }),
-            utility:Create("TextLabel", {
-                Name = "Title",
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 10, 0, 8),
-                Size = UDim2.new(1, -40, 0, 16),
-                ZIndex = 4,
-                Font = Enum.Font.GothamSemibold,
-                TextColor3 = themes.TextColor,
-                TextSize = 14.000,
-                TextXAlignment = Enum.TextXAlignment.Left
-            }),
-            utility:Create("TextLabel", {
-                Name = "Text",
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 10, 1, -24),
-                Size = UDim2.new(1, -40, 0, 16),
-                ZIndex = 4,
-                Font = Enum.Font.Gotham,
-                TextColor3 = themes.TextColor,
-                TextSize = 12.000,
-                TextXAlignment = Enum.TextXAlignment.Left
-            })
-        }
-
-        if showButtons then
-            table.insert(notificationElements, utility:Create("ImageButton", {
-                Name = "Accept",
-                BackgroundTransparency = 1,
-                Position = UDim2.new(1, -26, 0, 8),
-                Size = UDim2.new(0, 16, 0, 16),
-                Image = "rbxassetid://5012538259",
-                ImageColor3 = themes.TextColor,
-                ZIndex = 4
-            }))
-            table.insert(notificationElements, utility:Create("ImageButton", {
-                Name = "Decline",
-                BackgroundTransparency = 1,
-                Position = UDim2.new(1, -26, 1, -24),
-                Size = UDim2.new(0, 16, 0, 16),
-                Image = "rbxassetid://5012538583",
-                ImageColor3 = themes.TextColor,
-                ZIndex = 4
-            }))
-        end
-
-        local notification = utility:Create("ImageLabel", {
-            Name = "Notification",
-            Parent = self.container,
-            BackgroundTransparency = 1,
-            Size = UDim2.new(0, 200, 0, 60),
-            Image = "rbxassetid://5028857472",
-            ImageColor3 = themes.Background,
-            ScaleType = Enum.ScaleType.Slice,
-            SliceCenter = Rect.new(4, 4, 296, 296),
-            ZIndex = 3,
-            ClipsDescendants = true
-        }, notificationElements)
-        
-        notification.Title.Text = title or "Notification"
-        notification.Text.Text = text or ""
-        local padding = 10
-        local textService = game:GetService("TextService")
-        local titleSize = textService:GetTextSize(title, 14, Enum.Font.GothamSemibold, Vector2.new(math.huge, 16))
-        local textSize = textService:GetTextSize(text, 12, Enum.Font.Gotham, Vector2.new(math.huge, 16))
-        local maxTextWidth = math.max(titleSize.X, textSize.X)
-        notification.Position = library.lastNotification or UDim2.new(0, padding, 1, -(notification.AbsoluteSize.Y + padding))
-        notification.Size = UDim2.new(0, 0, 0, 60)
-        
-        -- Tween size and flash animation
-        utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2)
-        wait(0.2)
-        notification.ClipsDescendants = false
-        utility:Tween(notification.Flash, {
-            Size = UDim2.new(0, 0, 0, 60),
-            Position = UDim2.new(1, 0, 0, 0)
-        }, 0.2)
-
-        local active = true
-        local function close()
-            if not active then return end
-            active = false
-            notification.ClipsDescendants = true
-            library.lastNotification = notification.Position
-            notification.Flash.Position = UDim2.new(0, 0, 0, 0)
-            utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
-            wait(0.2)
-            utility:Tween(notification, {
-                Size = UDim2.new(0, 0, 0, 60),
-                Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)
-            }, 0.2)
-            wait(0.2)
-            notification:Destroy()
-            
-            table.remove(library.notificationQueue, 1)
-            if #library.notificationQueue > 0 then
-                library.notificationQueue[1]()
-            else
-                library.activeNotification = nil
-            end
-        end
-        
-        self.activeNotification = close
-
-        if duration and duration > 0 then
-            delay(duration, function()
-                if active then
-                    close()
-                end
-            end)
-        end
-
-        if showButtons then
-            notification.Accept.MouseButton1Click:Connect(function()
-                if not active then return end
-                if callback then callback(true) end
-                close()
-            end)
-            
-            notification.Decline.MouseButton1Click:Connect(function()
-                if not active then return end
-                if callback then callback(false) end
-                close()
-            end)
-        end
-    end
-
-    if self.activeNotification then
-        table.insert(self.notificationQueue, displayNotification)
-    else
-        displayNotification()
-    end
+	local notification = utility:Create("ImageLabel", {
+		Name = "Notification",
+		Parent = self.container,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 200, 0, 60),
+		Image = "rbxassetid://5028857472",
+		ImageColor3 = themes.Background,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(4, 4, 296, 296),
+		ZIndex = 3,
+		ClipsDescendants = true
+	}, notificationElements)
+	
+	-- dragging
+	utility:DraggingEnabled(notification)
+	
+	-- position and size
+	title = title or "Notification"
+	text = text or ""
+	
+	notification.Title.Text = title
+	notification.Text.Text = text
+	
+	local padding = 10
+	local titleSize = textService:GetTextSize(title, 14, Enum.Font.GothamSemibold, Vector2.new(math.huge, 16))
+	local textSize = textService:GetTextSize(text, 12, Enum.Font.Gotham, Vector2.new(math.huge, 16))
+	
+	local maxTextWidth = math.max(titleSize.X, textSize.X)
+	notification.Position = library.lastNotification or UDim2.new(0, padding, 1, -(notification.AbsoluteSize.Y + padding))
+	notification.Size = UDim2.new(0, 0, 0, 60)
+	
+	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2)
+	task.wait(0.2)
+	
+	notification.ClipsDescendants = false
+	utility:Tween(notification.Flash, {
+		Size = UDim2.new(0, 0, 0, 60),
+		Position = UDim2.new(1, 0, 0, 0)
+	}, 0.2)
+	
+	-- callbacks
+	local active = true
+	local close = function()
+		if not active then
+			return
+		end
+		
+		active = false
+		notification.ClipsDescendants = true
+		
+		library.lastNotification = notification.Position
+		notification.Flash.Position = UDim2.new(0, 0, 0, 0)
+		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
+		
+		task.wait(0.2)
+		utility:Tween(notification, {
+			Size = UDim2.new(0, 0, 0, 60),
+			Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)
+		}, 0.2)
+		
+		task.wait(0.2)
+		notification:Destroy()
+	end
+	
+	self.activeNotification = close
+	
+	-- auto-close after duration
+	if duration and duration > 0 then
+		delay(duration, function()
+			if active then
+				close()
+			end
+		end)
+	end
+	
+	if showButtons then
+		notification.Accept.MouseButton1Click:Connect(function()
+			if not active then 
+				return
+			end
+			
+			if callback then
+				callback(true)
+			end
+			
+			close()
+		end)
+		
+		notification.Decline.MouseButton1Click:Connect(function()
+			if not active then 
+				return
+			end
+			
+			if callback then
+				callback(false)
+			end
+			
+			close()
+		end)
+	end
 end
-
 
 	function section:addButton(title, callback)
 		local button = utility:Create("ImageButton", {
@@ -711,7 +731,7 @@ end
 			text.TextSize = 0
 			utility:Tween(button.Title, {TextSize = 14}, 0.2)
 			
-			wait(0.2)
+			task.wait(0.2)
 			utility:Tween(button.Title, {TextSize = 12}, 0.2)
 			
 			if callback then
@@ -869,7 +889,7 @@ end
 				Position = UDim2.new(1, -210, 0.5, -8)
 			}, 0.2)
 			
-			wait()
+			task.wait()
 
 			input.TextXAlignment = Enum.TextXAlignment.Left
 			input:CaptureFocus()
@@ -1490,7 +1510,7 @@ end
 				self.page.library.activePicker = animate
 				lastColor = Color3.fromHSV(hue, sat, brightness)
 				
-				local x1, x2 = button.AbsoluteSize.X / 2, 162--tab.AbsoluteSize.X
+				local x1, x2 = button.AbsoluteSize.X / 2, 162 --tab.AbsoluteSize.X
 				local px, py = button.AbsolutePosition.X, button.AbsolutePosition.Y
 				
 				tab.ClipsDescendants = true
@@ -1501,7 +1521,7 @@ end
 				utility:Tween(tab, {Size = UDim2.new(0, 162, 0, 169)}, 0.2)
 				
 				-- update size and position
-				wait(0.2)
+				task.wait(0.2)
 				tab.ClipsDescendants = false
 				
 				canvasSize, canvasPosition = canvas.AbsoluteSize, canvas.AbsolutePosition
@@ -1510,7 +1530,7 @@ end
 				utility:Tween(tab, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
 				tab.ClipsDescendants = true
 				
-				wait(0.2)
+				task.wait(0.2)
 				tab.Visible = false
 			end
 			
@@ -1842,7 +1862,7 @@ end
 				end
 			end
 			
-			wait(0.1)
+			task.wait(0.1)
 			page.container.Visible = true
 			
 			if focusedPage then
@@ -1858,17 +1878,17 @@ end
 				end
 			end
 			
-			wait(0.05)
+			task.wait(0.05)
 			
 			for i, section in pairs(page.sections) do
 			
 				utility:Tween(section.container.Title, {TextTransparency = 0}, 0.1)
 				section:Resize(true)
 				
-				wait(0.05)
+				task.wait(0.05)
 			end
 			
-			wait(0.05)
+			task.wait(0.05)
 			page:Resize(true)
 		else
 			-- page button
@@ -1885,7 +1905,7 @@ end
 				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.1)
 			end
 			
-			wait(0.1)
+			task.wait(0.1)
 			
 			page.lastPosition = page.container.CanvasPosition.Y
 			page:Resize()
@@ -1972,7 +1992,7 @@ end
 			Position = position[value] + UDim2.new(0, 0, 0, 2.5)
 		}, 0.2)
 		
-		wait(0.1)
+		task.wait(0.1)
 		utility:Tween(frame, {
 			Size = UDim2.new(1, -22, 1, -4),
 			Position = position[value]
