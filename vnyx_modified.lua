@@ -1,4 +1,4 @@
--- venyx ui lib, modified ;p
+-- venyx ui lib, modified by myzsyn
 -- init
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -156,11 +156,10 @@ do
 		return key
 	end
 	
-	function utility:DraggingEnabled(frame, parent)
+function utility:DraggingEnabled(frame, parent)
 	
 		parent = parent or frame
 		
-		-- stolen from wally or kiriot, kek
 		local dragging = false
 		local dragInput, mousePos, framePos
 
@@ -187,7 +186,8 @@ do
 		input.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
 				local delta = input.Position - mousePos
-				parent.Position  = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+				local targetPosition = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X,framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+			    tween:Create(parent, TweenInfo.new(0.15, Enum.EasingStyle.Circular, Enum.EasingDirection.Out), { Position = targetPosition }):Play() -- erm sigma
 			end
 		end)
 
@@ -507,22 +507,11 @@ do
 		self.activeNotification = self.activeNotification()
 	end
 	
-	-- Determine if buttons should be visible
+	-- Determine if buttons should be created
 	local showButtons = not duration or duration <= 0 or callback ~= nil
 	
-	-- standard create
-	local notification = utility:Create("ImageLabel", {
-		Name = "Notification",
-		Parent = self.container,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, 200, 0, 60),
-		Image = "rbxassetid://5028857472",
-		ImageColor3 = themes.Background,
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(4, 4, 296, 296),
-		ZIndex = 3,
-		ClipsDescendants = true
-	}, {
+	-- Create notification UI
+	local notificationElements = {
 		utility:Create("ImageLabel", {
 			Name = "Flash",
 			Size = UDim2.new(1, 0, 1, 0),
@@ -563,28 +552,43 @@ do
 			TextColor3 = themes.TextColor,
 			TextSize = 12.000,
 			TextXAlignment = Enum.TextXAlignment.Left
-		}),
-		utility:Create("ImageButton", {
+		})
+	}
+
+	-- Conditionally add buttons if needed
+	if showButtons then
+		table.insert(notificationElements, utility:Create("ImageButton", {
 			Name = "Accept",
 			BackgroundTransparency = 1,
 			Position = UDim2.new(1, -26, 0, 8),
 			Size = UDim2.new(0, 16, 0, 16),
 			Image = "rbxassetid://5012538259",
 			ImageColor3 = themes.TextColor,
-			ZIndex = 4,
-			Visible = showButtons  -- Show buttons if no duration or callback is provided
-		}),
-		utility:Create("ImageButton", {
+			ZIndex = 4
+		}))
+		table.insert(notificationElements, utility:Create("ImageButton", {
 			Name = "Decline",
 			BackgroundTransparency = 1,
 			Position = UDim2.new(1, -26, 1, -24),
 			Size = UDim2.new(0, 16, 0, 16),
 			Image = "rbxassetid://5012538583",
 			ImageColor3 = themes.TextColor,
-			ZIndex = 4,
-			Visible = showButtons  -- Show buttons if no duration or callback is provided
-		})
-	})
+			ZIndex = 4
+		}))
+	end
+
+	local notification = utility:Create("ImageLabel", {
+		Name = "Notification",
+		Parent = self.container,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 200, 0, 60),
+		Image = "rbxassetid://5028857472",
+		ImageColor3 = themes.Background,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(4, 4, 296, 296),
+		ZIndex = 3,
+		ClipsDescendants = true
+	}, notificationElements)
 	
 	-- dragging
 	utility:DraggingEnabled(notification)
@@ -597,12 +601,16 @@ do
 	notification.Text.Text = text
 	
 	local padding = 10
-	local textSize = game:GetService("TextService"):GetTextSize(text, 12, Enum.Font.Gotham, Vector2.new(math.huge, 16))
+	local textService = game:GetService("TextService")
+	local titleSize = textService:GetTextSize(title, 14, Enum.Font.GothamSemibold, Vector2.new(math.huge, 16))
+	local textSize = textService:GetTextSize(text, 12, Enum.Font.Gotham, Vector2.new(math.huge, 16))
 	
+	-- Set notification width based on the longest text between title and description
+	local maxTextWidth = math.max(titleSize.X, textSize.X)
 	notification.Position = library.lastNotification or UDim2.new(0, padding, 1, -(notification.AbsoluteSize.Y + padding))
 	notification.Size = UDim2.new(0, 0, 0, 60)
 	
-	utility:Tween(notification, {Size = UDim2.new(0, textSize.X + 70, 0, 60)}, 0.2)
+	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2)
 	wait(0.2)
 	
 	notification.ClipsDescendants = false
@@ -628,7 +636,7 @@ do
 		wait(0.2)
 		utility:Tween(notification, {
 			Size = UDim2.new(0, 0, 0, 60),
-			Position = notification.Position + UDim2.new(0, textSize.X + 70, 0, 0)
+			Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)
 		}, 0.2)
 		
 		wait(0.2)
@@ -646,90 +654,32 @@ do
 		end)
 	end
 	
-	notification.Accept.MouseButton1Click:Connect(function()
-		if not active then 
-			return
-		end
-		
-		if callback then
-			callback(true)
-		end
-		
-		close()
-	end)
-	
-	notification.Decline.MouseButton1Click:Connect(function()
-		if not active then 
-			return
-		end
-		
-		if callback then
-			callback(false)
-		end
-		
-		close()
-	end)
-end
-	
-	function section:addButton(title, callback)
-		local button = utility:Create("ImageButton", {
-			Name = "Button",
-			Parent = self.container,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, 30),
-			ZIndex = 2,
-			Image = "rbxassetid://5028857472",
-			ImageColor3 = themes.DarkContrast,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(2, 2, 298, 298)
-		}, {
-			utility:Create("TextLabel", {
-				Name = "Title",
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0),
-				ZIndex = 3,
-				Font = Enum.Font.Gotham,
-				Text = title,
-				TextColor3 = themes.TextColor,
-				TextSize = 12,
-				TextTransparency = 0.10000000149012
-			})
-		})
-		
-		table.insert(self.modules, button)
-		--self:Resize()
-		
-		local text = button.Title
-		local debounce
-		
-		button.MouseButton1Click:Connect(function()
-			
-			if debounce then
+	if showButtons then
+		notification.Accept.MouseButton1Click:Connect(function()
+			if not active then 
 				return
 			end
 			
-			-- animation
-			utility:Pop(button, 10)
-			
-			debounce = true
-			text.TextSize = 0
-			utility:Tween(button.Title, {TextSize = 14}, 0.2)
-			
-			wait(0.2)
-			utility:Tween(button.Title, {TextSize = 12}, 0.2)
-			
 			if callback then
-				callback(function(...)
-					self:updateButton(button, ...)
-				end)
+				callback(true)
 			end
 			
-			debounce = false
+			close()
 		end)
 		
-		return button
+		notification.Decline.MouseButton1Click:Connect(function()
+			if not active then 
+				return
+			end
+			
+			if callback then
+				callback(false)
+			end
+			
+			close()
+		end)
 	end
+end
 	
 	function section:addToggle(title, default, callback)
 		local toggle = utility:Create("ImageButton", {
