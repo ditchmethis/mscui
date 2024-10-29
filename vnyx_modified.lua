@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, added theme auto-save
+-- much love <3, twean test
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -469,12 +469,12 @@ do
 		for theme, color3 in pairs(themes) do
 			table.insert(data, string.format("%s:%s,%s,%s", theme, color3.R, color3.G, color3.B))
 		end
-		writefile(fileName, table.concat(data, "\n"))
+		writefile("VenyxUIRevamp\\Themes.cfg", table.concat(data, "\n"))
 	end
 	
 	function library:loadThemes()
-		if isfile(fileName) then
-			local data = readfile(fileName)
+		if isfile("VenyxUIRevamp\\Themes.cfg") then
+			local data = readfile("VenyxUIRevamp\\Themes.cfg")
 			for line in string.gmatch(data, "[^\n]+") do
 				local theme, r, g, b = line:match("([^:]+):([^,]+),([^,]+),([^,]+)")
 				if theme and r and g and b then
@@ -514,29 +514,27 @@ do
 		local topbar = container.TopBar
 		
 		if self.position then
-			utility:Tween(container, {
-				Size = UDim2.new(0, 511, 0, 428),
-				Position = self.position
-			}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
-			task.wait(0.2)
+			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 428),Position = self.position}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.In)
+			task.wait(1.25)
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.In)
+			utility:Tween(topbar, {Transparency = 1}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
 			
 			container.ClipsDescendants = false
 			self.position = nil
+			print(self.toggling)
 		else
 			self.position = container.Position
 			container.ClipsDescendants = true
 			
 			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
-			task.wait(0.2)
+			utility:Tween(topbar, {Transparency = 0}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			task.wait(1)
 			
-			utility:Tween(container, {
-				Size = UDim2.new(0, 511, 0, 0),
-				Position = self.position + UDim2.new(0, 0, 0, 428)
-			}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 0),Position = self.position + UDim2.new(0, 0, 0, 428)}, 1.25, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
+			print(self.toggling)
 		end
 		
 		self.toggling = false
