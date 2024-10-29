@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, transparencies
+-- much love <3, color3
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -465,18 +465,24 @@ do
 	-- functions
 	
 	function library:setTheme(theme, color3)
-		themes[theme] = color3
-		
-		for property, objects in pairs(objects[theme]) do
-			for i, object in pairs(objects) do
-				if not object.Parent or (object.Name == "Button" and object.Parent.Name == "ColorPicker") then
-					objects[i] = nil -- i can do this because weak tables :D
-				else
-					object[property] = color3
-				end
-			end
-		end
+    	if typeof(color3) ~= "Color3" then
+	   warn("Attempted to set theme with invalid color for", theme)
+           return
+    	end
+
+    	themes[theme] = color3
+
+    	for property, objects in pairs(objects[theme] or {}) do
+            for i, object in pairs(objects) do
+	           if object and object.Parent and not (object.Name == "Button" and object.Parent.Name == "ColorPicker") then
+	              object[property] = color3
+	           else
+	              objects[i] = nil
+		   end
+        	end
+    	    end
 	end
+
 	
 	function library:toggle()
 	
