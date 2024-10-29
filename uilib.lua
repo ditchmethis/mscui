@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3,tw test
+-- much love <3, aeaea
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -112,7 +112,7 @@ do
 		clone:ClearAllChildren()
 		
 		object.ImageTransparency = 1
-		utility:Tween(clone, {Size = object.Size}, 2, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+		utility:Tween(clone, {Size = object.Size}, 0.2)
 		
 		spawn(function()
 			task.wait(0.2)
@@ -1866,7 +1866,7 @@ end
 				for i = existingSections, #page.sections + 1, -1 do
 					local section = focusedPage.sections[i].container.Parent
 					
-					utility:Tween(section, {ImageTransparency = 1}, 1.5, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+					utility:Tween(section, {ImageTransparency = 1}, 0.1)
 				end
 			end
 			
@@ -1932,7 +1932,7 @@ end
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2)
+			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
 		end
 	end
 	
