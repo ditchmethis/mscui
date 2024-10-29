@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, taesases.
+-- much love <3, tween test
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -112,7 +112,7 @@ do
 		clone:ClearAllChildren()
 		
 		object.ImageTransparency = 1
-		utility:Tween(clone, {Size = object.Size}, 0.2)
+		utility:Tween(clone, {Size = object.Size}, 1)
 		
 		spawn(function()
 			task.wait(0.2)
@@ -229,103 +229,96 @@ do
 	-- new classes
 	
 	function library.new(title)
-	local container = utility:Create("ScreenGui", {
-		Name = title,
-		Parent = game.CoreGui
-	}, {
-		utility:Create("ImageLabel", {
-			Name = "Main",
-			BackgroundTransparency = 1,
-			Position = UDim2.new(0.25, 0, 0.052435593, 0),
-			Size = UDim2.new(0, 511, 0, 428),
-			Image = "rbxassetid://4641149554",
-			ImageColor3 = themes.Background,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(4, 4, 296, 296)
+		local container = utility:Create("ScreenGui", {
+			Name = title,
+			Parent = game.CoreGui
 		}, {
-			utility:Create("UIGradient", { -- Adding UIGradient
-				Color = ColorSequence.new{
-					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),  -- Start color (e.g., Red)
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))   -- End color (e.g., Blue)
-				},
-				Rotation = 45 -- Adjust as needed
-			}),
 			utility:Create("ImageLabel", {
-				Name = "Glow",
+				Name = "Main",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0, -15, 0, -15),
-				Size = UDim2.new(1, 30, 1, 30),
-				ZIndex = 0,
-				Image = "rbxassetid://5028857084",
-				ImageColor3 = themes.Glow,
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = Rect.new(24, 24, 276, 276)
-			}),
-			utility:Create("ImageLabel", {
-				Name = "Pages",
-				BackgroundTransparency = 1,
-				ClipsDescendants = true,
-				Position = UDim2.new(0, 0, 0, 38),
-				Size = UDim2.new(0, 126, 1, -38),
-				ZIndex = 3,
-				Image = "rbxassetid://5012534273",
-				ImageColor3 = themes.DarkContrast,
+				Position = UDim2.new(0.25, 0, 0.052435593, 0),
+				Size = UDim2.new(0, 511, 0, 428),
+				Image = "rbxassetid://4641149554",
+				ImageColor3 = themes.Background,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(4, 4, 296, 296)
 			}, {
-				utility:Create("ScrollingFrame", {
-					Name = "Pages_Container",
-					Active = true,
+				utility:Create("ImageLabel", {
+					Name = "Glow",
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 0, 0, 10),
-					Size = UDim2.new(1, 0, 1, -20),
-					CanvasSize = UDim2.new(0, 0, 0, 314),
-					ScrollBarThickness = 0
+					Position = UDim2.new(0, -15, 0, -15),
+					Size = UDim2.new(1, 30, 1, 30),
+					ZIndex = 0,
+					Image = "rbxassetid://5028857084",
+					ImageColor3 = themes.Glow,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(24, 24, 276, 276)
+				}),
+				utility:Create("ImageLabel", {
+					Name = "Pages",
+					BackgroundTransparency = 1,
+					ClipsDescendants = true,
+					Position = UDim2.new(0, 0, 0, 38),
+					Size = UDim2.new(0, 126, 1, -38),
+					ZIndex = 3,
+					Image = "rbxassetid://5012534273",
+					ImageColor3 = themes.DarkContrast,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(4, 4, 296, 296)
 				}, {
-					utility:Create("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						Padding = UDim.new(0, 10)
+					utility:Create("ScrollingFrame", {
+						Name = "Pages_Container",
+						Active = true,
+						BackgroundTransparency = 1,
+						Position = UDim2.new(0, 0, 0, 10),
+						Size = UDim2.new(1, 0, 1, -20),
+						CanvasSize = UDim2.new(0, 0, 0, 314),
+						ScrollBarThickness = 0
+					}, {
+						utility:Create("UIListLayout", {
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							Padding = UDim.new(0, 10)
+						})
 					})
-				})
-			}),
-			utility:Create("ImageLabel", {
-				Name = "TopBar",
-				BackgroundTransparency = 1,
-				ClipsDescendants = true,
-				Size = UDim2.new(1, 0, 0, 38),
-				ZIndex = 5,
-				Image = "rbxassetid://4595286933",
-				ImageColor3 = themes.Accent,
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = Rect.new(4, 4, 296, 296)
-			}, {
-				utility:Create("TextLabel", { -- title
-					Name = "Title",
-					AnchorPoint = Vector2.new(0, 0.5),
+				}),
+				utility:Create("ImageLabel", {
+					Name = "TopBar",
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 12, 0, 19),
-					Size = UDim2.new(1, -46, 0, 16),
+					ClipsDescendants = true,
+					Size = UDim2.new(1, 0, 0, 38),
 					ZIndex = 5,
-					Font = Enum.Font.GothamBold,
-					Text = title,
-					TextColor3 = themes.TextColor,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left
+					Image = "rbxassetid://4595286933",
+					ImageColor3 = themes.Accent,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(4, 4, 296, 296)
+				}, {
+					utility:Create("TextLabel", { -- title
+						Name = "Title",
+						AnchorPoint = Vector2.new(0, 0.5),
+						BackgroundTransparency = 1,
+						Position = UDim2.new(0, 12, 0, 19),
+						Size = UDim2.new(1, -46, 0, 16),
+						ZIndex = 5,
+						Font = Enum.Font.GothamBold,
+						Text = title,
+						TextColor3 = themes.TextColor,
+						TextSize = 14,
+						TextXAlignment = Enum.TextXAlignment.Left
+					})
 				})
 			})
 		})
-	})
-	
-	utility:InitializeKeybind()
-	utility:DraggingEnabled(container.Main.TopBar, container.Main)
-	
-	return setmetatable({
-		container = container,
-		pagesContainer = container.Main.Pages.Pages_Container,
-		pages = {}
-	}, library)
+		
+		utility:InitializeKeybind()
+		utility:DraggingEnabled(container.Main.TopBar, container.Main)
+		
+		return setmetatable({
+			container = container,
+			pagesContainer = container.Main.Pages.Pages_Container,
+			pages = {}
+		}, library)
 	end
-
+	
 	function page.new(library, title, icon)
 		local button = utility:Create("TextButton", {
 			Name = title,
@@ -496,10 +489,10 @@ do
 			utility:Tween(container, {
 				Size = UDim2.new(0, 511, 0, 428),
 				Position = self.position
-			}, 0.2)
+			}, 1)
 			task.wait(0.2)
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 0.2)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1)
 			task.wait(0.2)
 			
 			container.ClipsDescendants = false
@@ -508,13 +501,10 @@ do
 			self.position = container.Position
 			container.ClipsDescendants = true
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 1)
 			task.wait(0.2)
 			
-			utility:Tween(container, {
-				Size = UDim2.new(0, 511, 0, 0),
-				Position = self.position + UDim2.new(0, 0, 0, 428)
-			}, 0.2)
+			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 0),Position = self.position + UDim2.new(0, 0, 0, 428)}, 1)
 			task.wait(0.2)
 		end
 		
@@ -630,14 +620,11 @@ do
 	notification.Position = library.lastNotification or UDim2.new(0, padding, 1, -(notification.AbsoluteSize.Y + padding))
 	notification.Size = UDim2.new(0, 0, 0, 60)
 	
-	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2)
+	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 1)
 	task.wait(0.2)
 	
 	notification.ClipsDescendants = false
-	utility:Tween(notification.Flash, {
-		Size = UDim2.new(0, 0, 0, 60),
-		Position = UDim2.new(1, 0, 0, 0)
-	}, 0.2)
+	utility:Tween(notification.Flash, {Size = UDim2.new(0, 0, 0, 60),Position = UDim2.new(1, 0, 0, 0)}, 1)
 	
 	-- callbacks
 	local active = true
@@ -651,13 +638,10 @@ do
 		
 		library.lastNotification = notification.Position
 		notification.Flash.Position = UDim2.new(0, 0, 0, 0)
-		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
+		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 1)
 		
 		task.wait(0.2)
-		utility:Tween(notification, {
-			Size = UDim2.new(0, 0, 0, 60),
-			Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)
-		}, 0.2)
+		utility:Tween(notification, {Size = UDim2.new(0, 0, 0, 60),Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)}, 1)
 		
 		task.wait(0.2)
 		notification:Destroy()
@@ -744,10 +728,10 @@ end
 			
 			debounce = true
 			text.TextSize = 0
-			utility:Tween(button.Title, {TextSize = 14}, 0.2)
+			utility:Tween(button.Title, {TextSize = 14}, 1)
 			
 			task.wait(0.2)
-			utility:Tween(button.Title, {TextSize = 12}, 0.2)
+			utility:Tween(button.Title, {TextSize = 12}, 1)
 			
 			if callback then
 				callback(function(...)
@@ -902,7 +886,7 @@ end
 			utility:Tween(textbox.Button, {
 				Size = UDim2.new(0, 200, 0, 16),
 				Position = UDim2.new(1, -210, 0.5, -8)
-			}, 0.2)
+			}, 1)
 			
 			task.wait()
 
@@ -930,7 +914,7 @@ end
 			utility:Tween(textbox.Button, {
 				Size = UDim2.new(0, 100, 0, 16),
 				Position = UDim2.new(1, -110, 0.5, -8)
-			}, 0.2)
+			}, 1)
 			
 			if callback then
 				callback(input.Text, true, function(...)
@@ -1457,7 +1441,7 @@ end
 				end
 				
 				self:updateColorPicker(colorpicker, nil, {hue, sat, brightness}) -- roblox is literally retarded
-				utility:Tween(canvas.Cursor, {Position = UDim2.new(sat, 0, 1 - brightness, 0)}, 0.1) -- overwrite
+				utility:Tween(canvas.Cursor, {Position = UDim2.new(sat, 0, 1 - brightness, 0)}, 0.75) -- overwrite
 				
 				callback(color3)
 				utility:Wait()
@@ -1478,7 +1462,7 @@ end
 				
 				local x = hue -- hue is updated
 				self:updateColorPicker(colorpicker, nil, {hue, sat, brightness}) -- roblox is literally retarded
-				utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(x, 0, 0, 0)}, 0.1) -- overwrite
+				utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(x, 0, 0, 0)}, 0.75) -- overwrite
 				
 				callback(color3)
 				utility:Wait()
@@ -1533,7 +1517,7 @@ end
 				tab.Size = UDim2.new(0, 0, 0, 0)
 				
 				tab.Position = UDim2.new(0, x1 + x2 + px, 0, py)
-				utility:Tween(tab, {Size = UDim2.new(0, 162, 0, 169)}, 0.2)
+				utility:Tween(tab, {Size = UDim2.new(0, 162, 0, 169)}, 1)
 				
 				-- update size and position
 				task.wait(0.2)
@@ -1542,7 +1526,7 @@ end
 				canvasSize, canvasPosition = canvas.AbsoluteSize, canvas.AbsolutePosition
 				colorSize, colorPosition = color.AbsoluteSize, color.AbsolutePosition
 			else
-				utility:Tween(tab, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
+				utility:Tween(tab, {Size = UDim2.new(0, 0, 0, 0)}, 1)
 				tab.ClipsDescendants = true
 				
 				task.wait(0.2)
@@ -1577,7 +1561,7 @@ function section:addSlider(title, default, min, max, callback)
         Parent = self.container,
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        Position = UDim2.new(0.292817682, 0, 0.299145311, 0),
+        Position = UDim2.new(0.292817682, 0, 199145311, 0),
         Size = UDim2.new(1, 0, 0, 50),
         ZIndex = 2,
         Image = "rbxassetid://5028857472",
@@ -1678,13 +1662,13 @@ function section:addSlider(title, default, min, max, callback)
         if dragging then
             dragging = false
             triggerCallback(value)
-            utility:Tween(circle, {ImageTransparency = 1}, 0.2)
+            utility:Tween(circle, {ImageTransparency = 1}, 1)
         end
     end)
     
     slider.MouseButton1Down:Connect(function(input)
         dragging = true
-        utility:Tween(circle, {ImageTransparency = 0}, 0.1)
+        utility:Tween(circle, {ImageTransparency = 0}, 0.75)
         
         while dragging do
             value = self:updateSlider(slider, nil, nil, min, max, value)
@@ -1873,7 +1857,7 @@ end
 				for i = existingSections, #page.sections + 1, -1 do
 					local section = focusedPage.sections[i].container.Parent
 					
-					utility:Tween(section, {ImageTransparency = 1}, 0.1)
+					utility:Tween(section, {ImageTransparency = 1}, 0.75)
 				end
 			end
 			
@@ -1897,7 +1881,7 @@ end
 			
 			for i, section in pairs(page.sections) do
 			
-				utility:Tween(section.container.Title, {TextTransparency = 0}, 0.1)
+				utility:Tween(section.container.Title, {TextTransparency = 0}, 0.75)
 				section:Resize(true)
 				
 				task.wait(0.05)
@@ -1916,8 +1900,8 @@ end
 			
 			-- sections
 			for i, section in pairs(page.sections) do	
-				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 0.1)
-				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.1)
+				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 0.75)
+				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.75)
 			end
 			
 			task.wait(0.1)
@@ -1939,7 +1923,7 @@ end
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2)
+			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 1)
 		end
 	end
 	
@@ -2005,13 +1989,13 @@ end
 		utility:Tween(frame, {
 			Size = UDim2.new(1, -22, 1, -9),
 			Position = position[value] + UDim2.new(0, 0, 0, 2.5)
-		}, 0.2)
+		}, 1)
 		
 		task.wait(0.1)
 		utility:Tween(frame, {
 			Size = UDim2.new(1, -22, 1, -4),
 			Position = position[value]
-		}, 0.1)
+		}, 0.75)
 	end
 	
 	function section:updateTextbox(textbox, title, value)
@@ -2073,7 +2057,7 @@ end
 		end
 		
 		utility:Tween(colorpicker.Button, {ImageColor3 = color3}, 0.5)
-		utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(hue, 0, 0, 0)}, 0.1)
+		utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(hue, 0, 0, 0)}, 0.75)
 		
 		utility:Tween(tab.Container.Canvas, {ImageColor3 = Color3.fromHSV(hue, 1, 1)}, 0.5)
 		utility:Tween(tab.Container.Canvas.Cursor, {Position = UDim2.new(sat, 0, 1 - brightness)}, 0.5)
@@ -2106,7 +2090,7 @@ end
 		value = value or math.floor(min + (max - min) * percent)
 		
 		slider.TextBox.Text = value
-		utility:Tween(bar.Fill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.1)
+		utility:Tween(bar.Fill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.75)
 		
 		if value ~= lvalue and slider.ImageTransparency == 0 then
 			utility:Pop(slider, 10)
