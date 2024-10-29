@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, taesases.
+-- much love <3, tessss
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -68,7 +68,7 @@ do
 	end
 	
 	function utility:Tween(instance, properties, duration, ...)
-		tween:Create(instance, tweeninfo(duration, Enum.EasingStyle.Circular, Enum.EasingDirection.Out, ...), properties):Play()
+		tween:Create(instance, tweeninfo(duration, ...), properties):Play()
 	end
 	
 	function utility:Wait()
@@ -112,7 +112,7 @@ do
 		clone:ClearAllChildren()
 		
 		object.ImageTransparency = 1
-		utility:Tween(clone, {Size = object.Size}, 0.2)
+		utility:Tween(clone, {Size = object.Size}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
 		
 		spawn(function()
 			task.wait(0.2)
@@ -203,7 +203,7 @@ function utility:DraggingEnabled(frame, parent)
 
 		input.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				utility:Tween(parent, { Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y) }, 0.3)
+				utility:Tween(parent, { Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y) }, 0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			end
 		end)
 
@@ -229,103 +229,96 @@ do
 	-- new classes
 	
 	function library.new(title)
-	local container = utility:Create("ScreenGui", {
-		Name = title,
-		Parent = game.CoreGui
-	}, {
-		utility:Create("ImageLabel", {
-			Name = "Main",
-			BackgroundTransparency = 1,
-			Position = UDim2.new(0.25, 0, 0.052435593, 0),
-			Size = UDim2.new(0, 511, 0, 428),
-			Image = "rbxassetid://4641149554",
-			ImageColor3 = themes.Background,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(4, 4, 296, 296)
+		local container = utility:Create("ScreenGui", {
+			Name = title,
+			Parent = game.CoreGui
 		}, {
-			utility:Create("UIGradient", { -- Adding UIGradient
-				Color = ColorSequence.new{
-					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),  -- Start color (e.g., Red)
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))   -- End color (e.g., Blue)
-				},
-				Rotation = 45 -- Adjust as needed
-			}),
 			utility:Create("ImageLabel", {
-				Name = "Glow",
+				Name = "Main",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0, -15, 0, -15),
-				Size = UDim2.new(1, 30, 1, 30),
-				ZIndex = 0,
-				Image = "rbxassetid://5028857084",
-				ImageColor3 = themes.Glow,
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = Rect.new(24, 24, 276, 276)
-			}),
-			utility:Create("ImageLabel", {
-				Name = "Pages",
-				BackgroundTransparency = 1,
-				ClipsDescendants = true,
-				Position = UDim2.new(0, 0, 0, 38),
-				Size = UDim2.new(0, 126, 1, -38),
-				ZIndex = 3,
-				Image = "rbxassetid://5012534273",
-				ImageColor3 = themes.DarkContrast,
+				Position = UDim2.new(0.25, 0, 0.052435593, 0),
+				Size = UDim2.new(0, 511, 0, 428),
+				Image = "rbxassetid://4641149554",
+				ImageColor3 = themes.Background,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(4, 4, 296, 296)
 			}, {
-				utility:Create("ScrollingFrame", {
-					Name = "Pages_Container",
-					Active = true,
+				utility:Create("ImageLabel", {
+					Name = "Glow",
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 0, 0, 10),
-					Size = UDim2.new(1, 0, 1, -20),
-					CanvasSize = UDim2.new(0, 0, 0, 314),
-					ScrollBarThickness = 0
+					Position = UDim2.new(0, -15, 0, -15),
+					Size = UDim2.new(1, 30, 1, 30),
+					ZIndex = 0,
+					Image = "rbxassetid://5028857084",
+					ImageColor3 = themes.Glow,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(24, 24, 276, 276)
+				}),
+				utility:Create("ImageLabel", {
+					Name = "Pages",
+					BackgroundTransparency = 1,
+					ClipsDescendants = true,
+					Position = UDim2.new(0, 0, 0, 38),
+					Size = UDim2.new(0, 126, 1, -38),
+					ZIndex = 3,
+					Image = "rbxassetid://5012534273",
+					ImageColor3 = themes.DarkContrast,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(4, 4, 296, 296)
 				}, {
-					utility:Create("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						Padding = UDim.new(0, 10)
+					utility:Create("ScrollingFrame", {
+						Name = "Pages_Container",
+						Active = true,
+						BackgroundTransparency = 1,
+						Position = UDim2.new(0, 0, 0, 10),
+						Size = UDim2.new(1, 0, 1, -20),
+						CanvasSize = UDim2.new(0, 0, 0, 314),
+						ScrollBarThickness = 0
+					}, {
+						utility:Create("UIListLayout", {
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							Padding = UDim.new(0, 10)
+						})
 					})
-				})
-			}),
-			utility:Create("ImageLabel", {
-				Name = "TopBar",
-				BackgroundTransparency = 1,
-				ClipsDescendants = true,
-				Size = UDim2.new(1, 0, 0, 38),
-				ZIndex = 5,
-				Image = "rbxassetid://4595286933",
-				ImageColor3 = themes.Accent,
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = Rect.new(4, 4, 296, 296)
-			}, {
-				utility:Create("TextLabel", { -- title
-					Name = "Title",
-					AnchorPoint = Vector2.new(0, 0.5),
+				}),
+				utility:Create("ImageLabel", {
+					Name = "TopBar",
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 12, 0, 19),
-					Size = UDim2.new(1, -46, 0, 16),
+					ClipsDescendants = true,
+					Size = UDim2.new(1, 0, 0, 38),
 					ZIndex = 5,
-					Font = Enum.Font.GothamBold,
-					Text = title,
-					TextColor3 = themes.TextColor,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left
+					Image = "rbxassetid://4595286933",
+					ImageColor3 = themes.Accent,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(4, 4, 296, 296)
+				}, {
+					utility:Create("TextLabel", { -- title
+						Name = "Title",
+						AnchorPoint = Vector2.new(0, 0.5),
+						BackgroundTransparency = 1,
+						Position = UDim2.new(0, 12, 0, 19),
+						Size = UDim2.new(1, -46, 0, 16),
+						ZIndex = 5,
+						Font = Enum.Font.GothamBold,
+						Text = title,
+						TextColor3 = themes.TextColor,
+						TextSize = 14,
+						TextXAlignment = Enum.TextXAlignment.Left
+					})
 				})
 			})
 		})
-	})
-	
-	utility:InitializeKeybind()
-	utility:DraggingEnabled(container.Main.TopBar, container.Main)
-	
-	return setmetatable({
-		container = container,
-		pagesContainer = container.Main.Pages.Pages_Container,
-		pages = {}
-	}, library)
+		
+		utility:InitializeKeybind()
+		utility:DraggingEnabled(container.Main.TopBar, container.Main)
+		
+		return setmetatable({
+			container = container,
+			pagesContainer = container.Main.Pages.Pages_Container,
+			pages = {}
+		}, library)
 	end
-
+	
 	function page.new(library, title, icon)
 		local button = utility:Create("TextButton", {
 			Name = title,
