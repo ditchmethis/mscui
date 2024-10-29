@@ -1,6 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, tween test
-
+-- much love <3, zzzzzzzzzz
 local cloneref = cloneref or function(...) return ... end
 
 local GetProtectedService = setmetatable({}, {
@@ -68,7 +67,7 @@ do
 	end
 	
 	function utility:Tween(instance, properties, duration, ...)
-		tween:Create(instance, tweeninfo(duration, Enum.EasingStyle.Circular, Enum.EasingDirection.Out, ...), properties):Play()
+		tween:Create(instance, tweeninfo(duration, ...), properties):Play()
 	end
 	
 	function utility:Wait()
@@ -112,7 +111,7 @@ do
 		clone:ClearAllChildren()
 		
 		object.ImageTransparency = 1
-		utility:Tween(clone, {Size = object.Size}, 1)
+		utility:Tween(clone, {Size = object.Size}, 2, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
 		
 		spawn(function()
 			task.wait(0.2)
@@ -203,7 +202,7 @@ function utility:DraggingEnabled(frame, parent)
 
 		input.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				utility:Tween(parent, { Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y) }, 0.3)
+				utility:Tween(parent, { Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y) }, 0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			end
 		end)
 
@@ -489,10 +488,10 @@ do
 			utility:Tween(container, {
 				Size = UDim2.new(0, 511, 0, 428),
 				Position = self.position
-			}, 1)
+			}, 0.2)
 			task.wait(0.2)
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 0.2)
 			task.wait(0.2)
 			
 			container.ClipsDescendants = false
@@ -501,10 +500,13 @@ do
 			self.position = container.Position
 			container.ClipsDescendants = true
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 1)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
 			task.wait(0.2)
 			
-			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 0),Position = self.position + UDim2.new(0, 0, 0, 428)}, 1)
+			utility:Tween(container, {
+				Size = UDim2.new(0, 511, 0, 0),
+				Position = self.position + UDim2.new(0, 0, 0, 428)
+			}, 0.2)
 			task.wait(0.2)
 		end
 		
@@ -620,11 +622,14 @@ do
 	notification.Position = library.lastNotification or UDim2.new(0, padding, 1, -(notification.AbsoluteSize.Y + padding))
 	notification.Size = UDim2.new(0, 0, 0, 60)
 	
-	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 1)
+	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2)
 	task.wait(0.2)
 	
 	notification.ClipsDescendants = false
-	utility:Tween(notification.Flash, {Size = UDim2.new(0, 0, 0, 60),Position = UDim2.new(1, 0, 0, 0)}, 1)
+	utility:Tween(notification.Flash, {
+		Size = UDim2.new(0, 0, 0, 60),
+		Position = UDim2.new(1, 0, 0, 0)
+	}, 0.2)
 	
 	-- callbacks
 	local active = true
@@ -638,10 +643,13 @@ do
 		
 		library.lastNotification = notification.Position
 		notification.Flash.Position = UDim2.new(0, 0, 0, 0)
-		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 1)
+		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
 		
 		task.wait(0.2)
-		utility:Tween(notification, {Size = UDim2.new(0, 0, 0, 60),Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)}, 1)
+		utility:Tween(notification, {
+			Size = UDim2.new(0, 0, 0, 60),
+			Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)
+		}, 0.2)
 		
 		task.wait(0.2)
 		notification:Destroy()
@@ -728,10 +736,10 @@ end
 			
 			debounce = true
 			text.TextSize = 0
-			utility:Tween(button.Title, {TextSize = 14}, 1)
+			utility:Tween(button.Title, {TextSize = 14}, 0.2)
 			
 			task.wait(0.2)
-			utility:Tween(button.Title, {TextSize = 12}, 1)
+			utility:Tween(button.Title, {TextSize = 12}, 0.2)
 			
 			if callback then
 				callback(function(...)
@@ -886,7 +894,7 @@ end
 			utility:Tween(textbox.Button, {
 				Size = UDim2.new(0, 200, 0, 16),
 				Position = UDim2.new(1, -210, 0.5, -8)
-			}, 1)
+			}, 0.2)
 			
 			task.wait()
 
@@ -914,7 +922,7 @@ end
 			utility:Tween(textbox.Button, {
 				Size = UDim2.new(0, 100, 0, 16),
 				Position = UDim2.new(1, -110, 0.5, -8)
-			}, 1)
+			}, 0.2)
 			
 			if callback then
 				callback(input.Text, true, function(...)
@@ -1441,7 +1449,7 @@ end
 				end
 				
 				self:updateColorPicker(colorpicker, nil, {hue, sat, brightness}) -- roblox is literally retarded
-				utility:Tween(canvas.Cursor, {Position = UDim2.new(sat, 0, 1 - brightness, 0)}, 0.75) -- overwrite
+				utility:Tween(canvas.Cursor, {Position = UDim2.new(sat, 0, 1 - brightness, 0)}, 0.1) -- overwrite
 				
 				callback(color3)
 				utility:Wait()
@@ -1462,7 +1470,7 @@ end
 				
 				local x = hue -- hue is updated
 				self:updateColorPicker(colorpicker, nil, {hue, sat, brightness}) -- roblox is literally retarded
-				utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(x, 0, 0, 0)}, 0.75) -- overwrite
+				utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(x, 0, 0, 0)}, 0.1) -- overwrite
 				
 				callback(color3)
 				utility:Wait()
@@ -1517,7 +1525,7 @@ end
 				tab.Size = UDim2.new(0, 0, 0, 0)
 				
 				tab.Position = UDim2.new(0, x1 + x2 + px, 0, py)
-				utility:Tween(tab, {Size = UDim2.new(0, 162, 0, 169)}, 1)
+				utility:Tween(tab, {Size = UDim2.new(0, 162, 0, 169)}, 0.2)
 				
 				-- update size and position
 				task.wait(0.2)
@@ -1526,7 +1534,7 @@ end
 				canvasSize, canvasPosition = canvas.AbsoluteSize, canvas.AbsolutePosition
 				colorSize, colorPosition = color.AbsoluteSize, color.AbsolutePosition
 			else
-				utility:Tween(tab, {Size = UDim2.new(0, 0, 0, 0)}, 1)
+				utility:Tween(tab, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
 				tab.ClipsDescendants = true
 				
 				task.wait(0.2)
@@ -1561,7 +1569,7 @@ function section:addSlider(title, default, min, max, callback)
         Parent = self.container,
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        Position = UDim2.new(0.292817682, 0, 199145311, 0),
+        Position = UDim2.new(0.292817682, 0, 0.299145311, 0),
         Size = UDim2.new(1, 0, 0, 50),
         ZIndex = 2,
         Image = "rbxassetid://5028857472",
@@ -1662,13 +1670,13 @@ function section:addSlider(title, default, min, max, callback)
         if dragging then
             dragging = false
             triggerCallback(value)
-            utility:Tween(circle, {ImageTransparency = 1}, 1)
+            utility:Tween(circle, {ImageTransparency = 1}, 0.2)
         end
     end)
     
     slider.MouseButton1Down:Connect(function(input)
         dragging = true
-        utility:Tween(circle, {ImageTransparency = 0}, 0.75)
+        utility:Tween(circle, {ImageTransparency = 0}, 0.1)
         
         while dragging do
             value = self:updateSlider(slider, nil, nil, min, max, value)
@@ -1857,7 +1865,7 @@ end
 				for i = existingSections, #page.sections + 1, -1 do
 					local section = focusedPage.sections[i].container.Parent
 					
-					utility:Tween(section, {ImageTransparency = 1}, 0.75)
+					utility:Tween(section, {ImageTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 				end
 			end
 			
@@ -1873,7 +1881,7 @@ end
 					local section = page.sections[i].container.Parent
 					
 					section.ImageTransparency = 1
-					utility:Tween(section, {ImageTransparency = 0}, 0.05)
+					utility:Tween(section, {ImageTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 				end
 			end
 			
@@ -1881,7 +1889,7 @@ end
 			
 			for i, section in pairs(page.sections) do
 			
-				utility:Tween(section.container.Title, {TextTransparency = 0}, 0.75)
+				utility:Tween(section.container.Title, {TextTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 				section:Resize(true)
 				
 				task.wait(0.05)
@@ -1900,8 +1908,8 @@ end
 			
 			-- sections
 			for i, section in pairs(page.sections) do	
-				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 0.75)
-				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.75)
+				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+				utility:Tween(section.container.Title, {TextTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 			end
 			
 			task.wait(0.1)
@@ -1923,7 +1931,7 @@ end
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 1)
+			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2)
 		end
 	end
 	
@@ -1989,13 +1997,13 @@ end
 		utility:Tween(frame, {
 			Size = UDim2.new(1, -22, 1, -9),
 			Position = position[value] + UDim2.new(0, 0, 0, 2.5)
-		}, 1)
+		}, 0.2)
 		
 		task.wait(0.1)
 		utility:Tween(frame, {
 			Size = UDim2.new(1, -22, 1, -4),
 			Position = position[value]
-		}, 0.75)
+		}, 0.1)
 	end
 	
 	function section:updateTextbox(textbox, title, value)
@@ -2057,7 +2065,7 @@ end
 		end
 		
 		utility:Tween(colorpicker.Button, {ImageColor3 = color3}, 0.5)
-		utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(hue, 0, 0, 0)}, 0.75)
+		utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(hue, 0, 0, 0)}, 0.1)
 		
 		utility:Tween(tab.Container.Canvas, {ImageColor3 = Color3.fromHSV(hue, 1, 1)}, 0.5)
 		utility:Tween(tab.Container.Canvas.Cursor, {Position = UDim2.new(sat, 0, 1 - brightness)}, 0.5)
@@ -2090,7 +2098,7 @@ end
 		value = value or math.floor(min + (max - min) * percent)
 		
 		slider.TextBox.Text = value
-		utility:Tween(bar.Fill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.75)
+		utility:Tween(bar.Fill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.1)
 		
 		if value ~= lvalue and slider.ImageTransparency == 0 then
 			utility:Pop(slider, 10)
