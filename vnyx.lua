@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, color3
+-- much love <3, on testing
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -291,6 +291,7 @@ do
 					Size = UDim2.new(1, 0, 0, 38),
 					ZIndex = 5,
 					Image = "rbxassetid://4595286933",
+					BackgroundColor3 = themes.Accent,
 					ImageColor3 = themes.Accent,
 					ScaleType = Enum.ScaleType.Slice,
 					SliceCenter = Rect.new(4, 4, 296, 296)
@@ -463,26 +464,44 @@ do
 	end
 	
 	-- functions
+
+	function library:saveThemes()
+		local data = {}
+		for theme, color3 in pairs(themes) do
+			table.insert(data, string.format("%s:%s,%s,%s", theme, color3.R, color3.G, color3.B))
+		end
+		writefile("VenyxUIRevamp\\Themes.cfg", table.concat(data, "\n"))
+	end
 	
-	function library:setTheme(theme, color3)
-    	if typeof(color3) ~= "Color3" then
-	   warn("Attempted to set theme with invalid color for", theme)
-           return
-    	end
-
-    	themes[theme] = color3
-
-    	for property, objects in pairs(objects[theme] or {}) do
-            for i, object in pairs(objects) do
-	           if object and object.Parent and not (object.Name == "Button" and object.Parent.Name == "ColorPicker") then
-	              object[property] = color3
-	           else
-	              objects[i] = nil
-		   end
-        	end
-    	    end
+	function library:loadThemes()
+		if isfile("VenyxUIRevamp\\Themes.cfg") then
+			local data = readfile("VenyxUIRevamp\\Themes.cfg")
+			for line in string.gmatch(data, "[^\n]+") do
+				local theme, r, g, b = line:match("([^:]+):([^,]+),([^,]+),([^,]+)")
+				if theme and r and g and b then
+					themes[theme] = Color3.new(tonumber(r), tonumber(g), tonumber(b))
+				end
+			end
+		end
 	end
 
+	library:loadThemes()
+	
+	function library:setTheme(theme, color3)
+		themes[theme] = color3
+		
+		for property, objects in pairs(objects[theme]) do
+			for i, object in pairs(objects) do
+				if not object.Parent or (object.Name == "Button" and object.Parent.Name == "ColorPicker") then
+					objects[i] = nil -- i can do this because weak tables :D
+				else
+					object[property] = color3
+				end
+			end
+		end
+
+		library:saveThemes()
+	end
 	
 	function library:toggle()
 	
@@ -496,13 +515,14 @@ do
 		local topbar = container.TopBar
 		
 		if self.position then
-			utility:Tween(container, {
-				Size = UDim2.new(0, 511, 0, 428),
-				Position = self.position
-			}, 0.2)
-			task.wait(0.2)
+			topbar.Title.Text = "Welcome back, "..player.DisplayName.."! :)"
+			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 428),Position = self.position}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+			task.wait(1.25)
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 0.2)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+			task.wait(1)
+			utility:Tween(topbar, {Transparency = 1}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+			topbar.Title.Text = topbar.Parent.Parent.Name
 			task.wait(0.2)
 			
 			container.ClipsDescendants = false
@@ -510,14 +530,13 @@ do
 		else
 			self.position = container.Position
 			container.ClipsDescendants = true
+			topbar.Title.Text = "Hiding UI... :)"
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
-			task.wait(0.2)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			utility:Tween(topbar, {Transparency = 0}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+			task.wait(1)
 			
-			utility:Tween(container, {
-				Size = UDim2.new(0, 511, 0, 0),
-				Position = self.position + UDim2.new(0, 0, 0, 428)
-			}, 0.2)
+			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 0),Position = self.position + UDim2.new(0, 0, 0, 428)}, 1.25, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
 		end
 		
@@ -706,6 +725,7 @@ end
 			Name = "Button",
 			Parent = self.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.25,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 30),
 			ZIndex = 2,
@@ -1889,7 +1909,7 @@ end
 					local section = page.sections[i].container.Parent
 					
 					section.ImageTransparency = 1
-					utility:Tween(section, {ImageTransparency = 0}, 0.05)
+					utility:Tween(section, {ImageTransparency = 0.25}, 0.05)
 				end
 			end
 			
