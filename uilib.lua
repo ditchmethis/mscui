@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, tessss
+-- much love <3,tw test
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -112,7 +112,7 @@ do
 		clone:ClearAllChildren()
 		
 		object.ImageTransparency = 1
-		utility:Tween(clone, {Size = object.Size}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+		utility:Tween(clone, {Size = object.Size}, 2, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
 		
 		spawn(function()
 			task.wait(0.2)
@@ -1866,7 +1866,7 @@ end
 				for i = existingSections, #page.sections + 1, -1 do
 					local section = focusedPage.sections[i].container.Parent
 					
-					utility:Tween(section, {ImageTransparency = 1}, 0.1)
+					utility:Tween(section, {ImageTransparency = 1}, 1.5, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 				end
 			end
 			
