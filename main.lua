@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3,brbrrbr
+-- much love <3, final real!??!?!
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -1932,7 +1932,7 @@ end
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 1, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
 		end
 	end
 	
@@ -1950,7 +1950,7 @@ end
 		end
 		
 		if smooth then
-			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 0.05)
+			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 1, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
 		else
 			self.container.Parent.Size = UDim2.new(1, -10, 0, size)
 			self.page:Resize()
