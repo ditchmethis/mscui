@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3,hiiiiiiiiiiiiiiiiiiii
+-- much love <3, added theme auto-save
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -236,6 +236,7 @@ do
 			utility:Create("ImageLabel", {
 				Name = "Main",
 				BackgroundTransparency = 1,
+				ImageTransparency = 0.05,
 				Position = UDim2.new(0.25, 0, 0.052435593, 0),
 				Size = UDim2.new(0, 511, 0, 428),
 				Image = "rbxassetid://4641149554",
@@ -257,6 +258,7 @@ do
 				utility:Create("ImageLabel", {
 					Name = "Pages",
 					BackgroundTransparency = 1,
+					ImageTransparency = 0.7,
 					ClipsDescendants = true,
 					Position = UDim2.new(0, 0, 0, 38),
 					Size = UDim2.new(0, 126, 1, -38),
@@ -284,6 +286,7 @@ do
 				utility:Create("ImageLabel", {
 					Name = "TopBar",
 					BackgroundTransparency = 1,
+					ImageTransparency = 0.75,
 					ClipsDescendants = true,
 					Size = UDim2.new(1, 0, 0, 38),
 					ZIndex = 5,
@@ -391,6 +394,7 @@ do
 			Name = title,
 			Parent = page.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.7,
 			Size = UDim2.new(1, -10, 0, 28),
 			ZIndex = 2,
 			Image = "rbxassetid://5028857472",
@@ -459,6 +463,28 @@ do
 	end
 	
 	-- functions
+
+	function library:saveThemes()
+		local data = {}
+		for theme, color3 in pairs(themes) do
+			table.insert(data, string.format("%s:%s,%s,%s", theme, color3.R, color3.G, color3.B))
+		end
+		writefile(fileName, table.concat(data, "\n"))
+	end
+	
+	function library:loadThemes()
+		if isfile(fileName) then
+			local data = readfile(fileName)
+			for line in string.gmatch(data, "[^\n]+") do
+				local theme, r, g, b = line:match("([^:]+):([^,]+),([^,]+),([^,]+)")
+				if theme and r and g and b then
+					themes[theme] = Color3.new(tonumber(r), tonumber(g), tonumber(b))
+				end
+			end
+		end
+	end
+
+	library:loadThemes()
 	
 	function library:setTheme(theme, color3)
 		themes[theme] = color3
@@ -472,6 +498,8 @@ do
 				end
 			end
 		end
+
+		library:saveThemes()
 	end
 	
 	function library:toggle()
@@ -489,10 +517,10 @@ do
 			utility:Tween(container, {
 				Size = UDim2.new(0, 511, 0, 428),
 				Position = self.position
-			}, 0.2)
+			}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 0.2)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
 			
 			container.ClipsDescendants = false
@@ -501,13 +529,13 @@ do
 			self.position = container.Position
 			container.ClipsDescendants = true
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
 			
 			utility:Tween(container, {
 				Size = UDim2.new(0, 511, 0, 0),
 				Position = self.position + UDim2.new(0, 0, 0, 428)
-			}, 0.2)
+			}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
 		end
 		
@@ -623,7 +651,7 @@ do
 	notification.Position = library.lastNotification or UDim2.new(0, padding, 1, -(notification.AbsoluteSize.Y + padding))
 	notification.Size = UDim2.new(0, 0, 0, 60)
 	
-	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2)
+	utility:Tween(notification, {Size = UDim2.new(0, maxTextWidth + 70, 0, 60)}, 0.2, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 	task.wait(0.2)
 	
 	notification.ClipsDescendants = false
@@ -644,13 +672,10 @@ do
 		
 		library.lastNotification = notification.Position
 		notification.Flash.Position = UDim2.new(0, 0, 0, 0)
-		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
+		utility:Tween(notification.Flash, {Size = UDim2.new(1, 0, 1, 0)}, 0.2, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
 		
 		task.wait(0.2)
-		utility:Tween(notification, {
-			Size = UDim2.new(0, 0, 0, 60),
-			Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)
-		}, 0.2)
+		utility:Tween(notification, {Size = UDim2.new(0, 0, 0, 60),Position = notification.Position + UDim2.new(0, maxTextWidth + 70, 0, 0)}, 0.2, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 		
 		task.wait(0.2)
 		notification:Destroy()
@@ -1932,7 +1957,7 @@ end
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.8, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 		end
 	end
 	
@@ -1950,7 +1975,7 @@ end
 		end
 		
 		if smooth then
-			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 0.8, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 		else
 			self.container.Parent.Size = UDim2.new(1, -10, 0, size)
 			self.page:Resize()
