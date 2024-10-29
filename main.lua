@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, fun twean
+-- much love <3, mmhh
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -117,7 +117,7 @@ do
 		spawn(function()
 			task.wait(0.2)
 		
-			object.ImageTransparency = 0
+			object.ImageTransparency = 0.25
 			clone:Destroy()
 		end)
 		
@@ -291,6 +291,7 @@ do
 					Size = UDim2.new(1, 0, 0, 38),
 					ZIndex = 5,
 					Image = "rbxassetid://4595286933",
+					BackgroundColor3 = themes.Accent,
 					ImageColor3 = themes.Accent,
 					ScaleType = Enum.ScaleType.Slice,
 					SliceCenter = Rect.new(4, 4, 296, 296)
@@ -514,13 +515,14 @@ do
 		local topbar = container.TopBar
 		
 		if self.position then
-			topbar.Title.Text = "Welcome back, "..LocalPlayer.DisplayName.."! :)"
-			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 428),Position = self.position}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.In)
+			topbar.Title.Text = "Welcome back, "..player.DisplayName.."! :)"
+			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 428),Position = self.position}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
 			task.wait(1.25)
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.In)
-			task.wait(0.5)
-			utility:Tween(topbar, {Transparency = 1}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+			task.wait(1)
+			utility:Tween(topbar, {Transparency = 1}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+			topbar.Title.Text = topbar.Parent.Parent.Name
 			task.wait(0.2)
 			
 			container.ClipsDescendants = false
@@ -528,12 +530,12 @@ do
 		else
 			self.position = container.Position
 			container.ClipsDescendants = true
+			topbar.Title.Text = "Hiding UI... :)"
 			
 			utility:Tween(topbar, {Size = UDim2.new(1, 0, 1, 0)}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
-			utility:Tween(topbar, {Transparency = 0}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			utility:Tween(topbar, {Transparency = 0}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
 			task.wait(1)
 			
-			topbar.Title.Text = "Hiding UI... :)"
 			utility:Tween(container, {Size = UDim2.new(0, 511, 0, 0),Position = self.position + UDim2.new(0, 0, 0, 428)}, 1.25, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			task.wait(0.2)
 		end
@@ -723,6 +725,7 @@ end
 			Name = "Button",
 			Parent = self.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.25,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 30),
 			ZIndex = 2,
@@ -783,6 +786,7 @@ end
 			Name = "Toggle",
 			Parent = self.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.25,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 30),
 			ZIndex = 2,
@@ -856,6 +860,7 @@ end
 			Name = "Textbox",
 			Parent = self.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.25,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 30),
 			ZIndex = 2,
@@ -964,6 +969,7 @@ end
 			Name = "Keybind",
 			Parent = self.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.25,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 30),
 			ZIndex = 2,
@@ -1069,6 +1075,7 @@ end
 			Name = "ColorPicker",
 			Parent = self.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.25,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 30),
 			ZIndex = 2,
@@ -1593,6 +1600,7 @@ function section:addSlider(title, default, min, max, callback)
         Name = "Slider",
         Parent = self.container,
         BackgroundTransparency = 1,
+		ImageTransparency = 0.25,
         BorderSizePixel = 0,
         Position = UDim2.new(0.292817682, 0, 0.299145311, 0),
         Size = UDim2.new(1, 0, 0, 50),
@@ -1738,6 +1746,7 @@ end
 			utility:Create("ImageLabel", {
 				Name = "Search",
 				BackgroundTransparency = 1,
+				ImageTransparency = 0.25,
 				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 0, 30),
 				ZIndex = 2,
@@ -1764,6 +1773,7 @@ end
 				utility:Create("ImageButton", {
 					Name = "Button",
 					BackgroundTransparency = 1,
+					ImageTransparency = 0.25,
 					BorderSizePixel = 0,
 					Position = UDim2.new(1, -28, 0.5, -9),
 					Size = UDim2.new(0, 18, 0, 18),
@@ -1883,7 +1893,7 @@ end
 			page:Resize()
 			
 			for i, section in pairs(page.sections) do
-				section.container.Parent.ImageTransparency = 0
+				section.container.Parent.ImageTransparency = 0.25
 			end
 			
 			if sectionsRequired < 0 then -- "hides" some sections
@@ -1906,7 +1916,7 @@ end
 					local section = page.sections[i].container.Parent
 					
 					section.ImageTransparency = 1
-					utility:Tween(section, {ImageTransparency = 0}, 0.05)
+					utility:Tween(section, {ImageTransparency = 0.25}, 0.05)
 				end
 			end
 			
