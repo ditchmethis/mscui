@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, very lean
+-- much love <3, transparencies
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -236,6 +236,7 @@ do
 			utility:Create("ImageLabel", {
 				Name = "Main",
 				BackgroundTransparency = 1,
+				ImageTransparency = 0.05,
 				Position = UDim2.new(0.25, 0, 0.052435593, 0),
 				Size = UDim2.new(0, 511, 0, 428),
 				Image = "rbxassetid://4641149554",
@@ -257,6 +258,7 @@ do
 				utility:Create("ImageLabel", {
 					Name = "Pages",
 					BackgroundTransparency = 1,
+					ImageTransparency = 0.7,
 					ClipsDescendants = true,
 					Position = UDim2.new(0, 0, 0, 38),
 					Size = UDim2.new(0, 126, 1, -38),
@@ -284,6 +286,7 @@ do
 				utility:Create("ImageLabel", {
 					Name = "TopBar",
 					BackgroundTransparency = 1,
+					ImageTransparency = 0.75,
 					ClipsDescendants = true,
 					Size = UDim2.new(1, 0, 0, 38),
 					ZIndex = 5,
@@ -391,6 +394,7 @@ do
 			Name = title,
 			Parent = page.container,
 			BackgroundTransparency = 1,
+			ImageTransparency = 0.7,
 			Size = UDim2.new(1, -10, 0, 28),
 			ZIndex = 2,
 			Image = "rbxassetid://5028857472",
