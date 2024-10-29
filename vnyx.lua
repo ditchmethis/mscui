@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, changed notify sound.
+-- much love <3, twean
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -1866,7 +1866,7 @@ end
 				for i = existingSections, #page.sections + 1, -1 do
 					local section = focusedPage.sections[i].container.Parent
 					
-					utility:Tween(section, {ImageTransparency = 1}, 1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+					utility:Tween(section, {ImageTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 				end
 			end
 			
@@ -1882,7 +1882,7 @@ end
 					local section = page.sections[i].container.Parent
 					
 					section.ImageTransparency = 1
-					utility:Tween(section, {ImageTransparency = 0}, 0.05)
+					utility:Tween(section, {ImageTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 				end
 			end
 			
@@ -1890,7 +1890,7 @@ end
 			
 			for i, section in pairs(page.sections) do
 			
-				utility:Tween(section.container.Title, {TextTransparency = 0}, 0.1)
+				utility:Tween(section.container.Title, {ImageTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 				section:Resize(true)
 				
 				task.wait(0.05)
@@ -1909,8 +1909,8 @@ end
 			
 			-- sections
 			for i, section in pairs(page.sections) do	
-				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 0.1)
-				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.1)
+				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+				utility:Tween(section.container.Title, {TextTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 			end
 			
 			task.wait(0.1)
