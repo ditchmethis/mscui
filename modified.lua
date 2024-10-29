@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, changed notify sound.
+-- much love <3, tweeeeeeeeeeens
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -68,7 +68,7 @@ do
 	end
 	
 	function utility:Tween(instance, properties, duration, ...)
-		tween:Create(instance, tweeninfo(duration, Enum.EasingStyle.Circular, Enum.EasingDirection.Out, ...), properties):Play()
+		tween:Create(instance, tweeninfo(duration, ...), properties):Play()
 	end
 	
 	function utility:Wait()
@@ -203,7 +203,7 @@ function utility:DraggingEnabled(frame, parent)
 
 		input.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				utility:Tween(parent, { Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y) }, 0.3)
+				utility:Tween(parent, { Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y) }, 0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 			end
 		end)
 
@@ -1932,7 +1932,7 @@ end
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2)
+			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 1.25, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 		end
 	end
 	
@@ -1950,7 +1950,7 @@ end
 		end
 		
 		if smooth then
-			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 0.05)
+			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 1.25, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
 		else
 			self.container.Parent.Size = UDim2.new(1, -10, 0, size)
 			self.page:Resize()
