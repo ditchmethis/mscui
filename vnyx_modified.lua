@@ -1,5 +1,6 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, zzzzzzzzzz
+-- much love <3,hiiiiiiiiiiiiiiiiiiii
+
 local cloneref = cloneref or function(...) return ... end
 
 local GetProtectedService = setmetatable({}, {
@@ -111,7 +112,7 @@ do
 		clone:ClearAllChildren()
 		
 		object.ImageTransparency = 1
-		utility:Tween(clone, {Size = object.Size}, 2, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
+		utility:Tween(clone, {Size = object.Size}, 0.2)
 		
 		spawn(function()
 			task.wait(0.2)
@@ -1865,7 +1866,7 @@ end
 				for i = existingSections, #page.sections + 1, -1 do
 					local section = focusedPage.sections[i].container.Parent
 					
-					utility:Tween(section, {ImageTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+					utility:Tween(section, {ImageTransparency = 1}, 0.1)
 				end
 			end
 			
@@ -1881,7 +1882,7 @@ end
 					local section = page.sections[i].container.Parent
 					
 					section.ImageTransparency = 1
-					utility:Tween(section, {ImageTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+					utility:Tween(section, {ImageTransparency = 0}, 0.05)
 				end
 			end
 			
@@ -1889,7 +1890,7 @@ end
 			
 			for i, section in pairs(page.sections) do
 			
-				utility:Tween(section.container.Title, {TextTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+				utility:Tween(section.container.Title, {TextTransparency = 0}, 0.1)
 				section:Resize(true)
 				
 				task.wait(0.05)
@@ -1908,8 +1909,8 @@ end
 			
 			-- sections
 			for i, section in pairs(page.sections) do	
-				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
-				utility:Tween(section.container.Title, {TextTransparency = 1}, 1, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 0.1)
+				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.1)
 			end
 			
 			task.wait(0.1)
@@ -1931,7 +1932,7 @@ end
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2)
+			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
 		end
 	end
 	
@@ -1949,7 +1950,7 @@ end
 		end
 		
 		if smooth then
-			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 0.05)
+			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
 		else
 			self.container.Parent.Size = UDim2.new(1, -10, 0, size)
 			self.page:Resize()
