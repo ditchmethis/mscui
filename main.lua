@@ -463,6 +463,7 @@ do
         for theme, color3 in pairs(themes) do
             table.insert(data, string.format("%s:%s,%s,%s", theme, color3.R, color3.G, color3.B))
         end
+	if not isfolder("VenyxUIRevamp") then makefolder("VenyxUIRevamp") end
         writefile("VenyxUIRevamp/Themes.cfg", table.concat(data, "\n"))
     end
     
