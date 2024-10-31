@@ -463,12 +463,12 @@ do
         for theme, color3 in pairs(themes) do
             table.insert(data, string.format("%s:%s,%s,%s", theme, color3.R, color3.G, color3.B))
         end
-        writefile("VenyxUIRevamp\\Themes.cfg", table.concat(data, "\n"))
+        writefile("VenyxUIRevamp/Themes.cfg", table.concat(data, "\n"))
     end
     
     function library:loadThemes()
-        if isfile("VenyxUIRevamp\\Themes.cfg") then
-            local data = readfile("VenyxUIRevamp\\Themes.cfg")
+        if isfile("VenyxUIRevamp/Themes.cfg") then
+            local data = readfile("VenyxUIRevamp/Themes.cfg")
             for line in string.gmatch(data, "[^\n]+") do
                 local theme, r, g, b = line:match("([^:]+):([^,]+),([^,]+),([^,]+)")
                 if theme and r and g and b then
