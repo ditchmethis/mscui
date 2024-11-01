@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, atease
+-- much love <3, added btn, sliders, etc. removals.
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -1922,9 +1922,9 @@ end
 		return dropdown
 	end    
 
-    function section:addDropdownSelection(title, list, callback)
+    function section:addMultiDropdown(title, list, callback)
         local dropdown = utility:Create("Frame", {
-            Name = "DropdownSelection",
+            Name = "MultiDropdown",
             Parent = self.container,
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 30),
@@ -1958,7 +1958,7 @@ end
                     Text = title,
                     TextColor3 = themes.TextColor,
                     TextSize = 12,
-                    TextTransparency = 0.1,
+                    TextTransparency = 0.10000000149012,
                     TextXAlignment = Enum.TextXAlignment.Left
                 }),
                 utility:Create("ImageButton", {
@@ -2005,35 +2005,47 @@ end
                 })
             })
         })
-    
-        local selectedItems = {}
-    
-        local function updateSelection(item)
-            selectedItems[item] = not selectedItems[item]
-            local selectedList = {}
-            for k in pairs(selectedItems) do
-                table.insert(selectedList, k)
-            end
-            if callback then
-                callback(selectedList)
-            end
-        end
-    
+        
         table.insert(self.modules, dropdown)
-    
-        search = dropdown.Search
+        
+        local search = dropdown.Search
+        local focused
+        local selectedItems = {}
+        
+        list = list or {}
+        
         search.Button.MouseButton1Click:Connect(function()
+            utility:Tween(search.Button, {Rotation = search.Button.Rotation == 0 and 180 or 0}, 0.3)
+            self:updateMultiDropdown(dropdown, list, callback, selectedItems, title)
+        end)
+        
+        search.TextBox.Focused:Connect(function()
             if search.Button.Rotation == 0 then
-                self:updateDropdown(dropdown, nil, list, function(item)
-                    updateSelection(item)
-                end)
-            else
-                self:updateDropdown(dropdown, nil, nil, callback)
+                utility:Tween(search.Button, {Rotation = 180}, 0.3)
+            end
+            self:updateMultiDropdown(dropdown, list, callback, selectedItems, title)
+            focused = true
+        end)
+        
+        search.TextBox.FocusLost:Connect(function()
+            focused = false
+        end)
+        
+        search.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+            if focused then
+                self:updateMultiDropdown(dropdown, list, callback, selectedItems, title)
             end
         end)
-    
+        
+        search.TextBox.Focused:Wait()
+        self:updateMultiDropdown(dropdown, list, callback, selectedItems, title)
+        
+        dropdown:GetPropertyChangedSignal("Size"):Connect(function()
+            self:Resize()
+        end)
+        
         return dropdown
-    end    
+    end
 
     function section:removeDropdown(dropdown)
         for i, module in pairs(self.modules) do
@@ -2405,6 +2417,107 @@ end
 			frame.ScrollBarImageTransparency = 1
 		end
 	end
+
+    function section:updateMultiDropdown(dropdown, list, callback, selectedItems, title)
+        local sortedList = utility:Sort(dropdown.Search.TextBox.Text, list)
+        if dropdown.Search.Button.Rotation == 180 then
+            dropdown.List.Visible = true
+            dropdown.List.Frame:ClearAllChildren()
+            
+            local button = utility:Create("UIListLayout", {
+                SortOrder = Enum.SortOrder.LayoutOrder,
+                Padding = UDim.new(0, 4)
+            })
+            
+            button.Parent = dropdown.List.Frame
+            
+            local entries = 0
+            
+            for i, value in pairs(sortedList) do
+                local button = utility:Create("ImageButton", {
+                    Name = value,
+                    BackgroundTransparency = 1,
+                    BorderSizePixel = 0,
+                    Size = UDim2.new(1, 0, 0, 30),
+                    ZIndex = 2,
+                    Image = "rbxassetid://5028857472",
+                    ImageColor3 = themes.DarkContrast,
+                    ScaleType = Enum.ScaleType.Slice,
+                    SliceCenter = Rect.new(2, 2, 298, 298)
+                })
+                
+                local title = utility:Create("TextLabel", {
+                    Name = "Title",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, -10, 1, 0),
+                    Position = UDim2.new(0, 10, 0, 0),
+                    Font = Enum.Font.Gotham,
+                    Text = value,
+                    TextColor3 = themes.TextColor,
+                    TextSize = 12,
+                    TextTransparency = selectedItems[value] and 0 or 0.5,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    ZIndex = 3
+                })
+                
+                title.Parent = button
+                button.Parent = dropdown.List.Frame
+
+                local function updateText()
+                    local text = ""
+                    for item, _ in pairs(selectedItems) do
+                        text = text .. item .. ", "
+                    end
+                    text = text:sub(1, -3)
+                    dropdown.Search.TextBox.Text = text ~= "" and text or title
+                    utility:Pop(dropdown.Search, 10)
+                end
+                
+                button.MouseButton1Click:Connect(function()
+                    if selectedItems[value] then
+                        selectedItems[value] = nil
+                        utility:Tween(title, {TextTransparency = 0.5}, 0.3)
+                    else
+                        selectedItems[value] = true
+                        utility:Tween(title, {TextTransparency = 0}, 0.3)
+                    end
+                    
+                    updateText()
+                    
+                    if callback then
+                        local selected = {}
+                        for item, _ in pairs(selectedItems) do
+                            table.insert(selected, item)
+                        end
+                        callback(selected)
+                    end
+                end)
+                
+                entries = entries + 1
+            end
+            
+            local frame = dropdown.List.Frame
+            utility:Tween(dropdown, {Size = UDim2.new(1, 0, 0, (entries == 0 and 30) or math.clamp(entries, 0, 3) * 34 + 38)}, 0.3)
+            
+            if entries > 3 then
+                for i, button in pairs(frame:GetChildren()) do
+                    if button:IsA("ImageButton") then
+                        button.Size = UDim2.new(1, -6, 0, 30)
+                    end
+                end
+                
+                frame.CanvasSize = UDim2.new(0, 0, 0, (entries * 34) - 4)
+                frame.ScrollBarImageTransparency = 0
+            else
+                frame.CanvasSize = UDim2.new(0, 0, 0, 0)
+                frame.ScrollBarImageTransparency = 1
+            end
+        else
+            utility:Tween(dropdown, {Size = UDim2.new(1, 0, 0, 30)}, 0.3)
+            dropdown.List.Visible = false
+        end
+    end
+
 end
 
 return library
