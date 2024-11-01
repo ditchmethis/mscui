@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, TESTTTTT
+-- much love <3, qevqev
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -1920,152 +1920,125 @@ end
 		end)
 		
 		return dropdown
-	end
+	end    
 
-    function section:addMultiSelectDropdown(title, list, callback)
-    local dropdown = utility:Create("Frame", {
-        Name = "Dropdown",
-        Parent = self.container,
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 30),
-        ClipsDescendants = true
-    }, {
-        utility:Create("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 4)
-        }),
-        utility:Create("ImageLabel", {
-            Name = "Search",
+    function section:addDropdownSelection(title, list, callback)
+        local dropdown = utility:Create("Frame", {
+            Name = "DropdownSelection",
+            Parent = self.container,
             BackgroundTransparency = 1,
-            ImageTransparency = 0.25,
-            BorderSizePixel = 0,
             Size = UDim2.new(1, 0, 0, 30),
-            ZIndex = 2,
-            Image = "rbxassetid://5028857472",
-            ImageColor3 = themes.DarkContrast,
-            ScaleType = Enum.ScaleType.Slice,
-            SliceCenter = Rect.new(2, 2, 298, 298)
+            ClipsDescendants = true
         }, {
-            utility:Create("TextBox", {
-                Name = "TextBox",
-                AnchorPoint = Vector2.new(0, 0.5),
-                BackgroundTransparency = 1,
-                TextTruncate = Enum.TextTruncate.AtEnd,
-                Position = UDim2.new(0, 10, 0.5, 1),
-                Size = UDim2.new(1, -42, 1, 0),
-                ZIndex = 3,
-                Font = Enum.Font.Gotham,
-                Text = title,
-                TextColor3 = themes.TextColor,
-                TextSize = 12,
-                TextTransparency = 0,
-                TextXAlignment = Enum.TextXAlignment.Left
+            utility:Create("UIListLayout", {
+                SortOrder = Enum.SortOrder.LayoutOrder,
+                Padding = UDim.new(0, 4)
             }),
-            utility:Create("ImageButton", {
-                Name = "Button",
+            utility:Create("ImageLabel", {
+                Name = "Search",
                 BackgroundTransparency = 1,
                 ImageTransparency = 0.25,
                 BorderSizePixel = 0,
-                Position = UDim2.new(1, -28, 0.5, -9),
-                Size = UDim2.new(0, 18, 0, 18),
-                ZIndex = 3,
-                Image = "rbxassetid://5012539403",
-                ImageColor3 = themes.TextColor,
+                Size = UDim2.new(1, 0, 0, 30),
+                ZIndex = 2,
+                Image = "rbxassetid://5028857472",
+                ImageColor3 = themes.DarkContrast,
+                ScaleType = Enum.ScaleType.Slice,
                 SliceCenter = Rect.new(2, 2, 298, 298)
-            })
-        }),
-        utility:Create("ImageLabel", {
-            Name = "List",
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2.new(1, 0, 1, -34),
-            ZIndex = 2,
-            Image = "rbxassetid://5028857472",
-            ImageColor3 = themes.Background,
-            ScaleType = Enum.ScaleType.Slice,
-            SliceCenter = Rect.new(2, 2, 298, 298)
-        }, {
-            utility:Create("ScrollingFrame", {
-                Name = "Frame",
-                Active = true,
+            }, {
+                utility:Create("TextBox", {
+                    Name = "TextBox",
+                    AnchorPoint = Vector2.new(0, 0.5),
+                    BackgroundTransparency = 1,
+                    TextTruncate = Enum.TextTruncate.AtEnd,
+                    Position = UDim2.new(0, 10, 0.5, 1),
+                    Size = UDim2.new(1, -42, 1, 0),
+                    ZIndex = 3,
+                    Font = Enum.Font.Gotham,
+                    Text = title,
+                    TextColor3 = themes.TextColor,
+                    TextSize = 12,
+                    TextTransparency = 0.1,
+                    TextXAlignment = Enum.TextXAlignment.Left
+                }),
+                utility:Create("ImageButton", {
+                    Name = "Button",
+                    BackgroundTransparency = 1,
+                    ImageTransparency = 0.25,
+                    BorderSizePixel = 0,
+                    Position = UDim2.new(1, -28, 0.5, -9),
+                    Size = UDim2.new(0, 18, 0, 18),
+                    ZIndex = 3,
+                    Image = "rbxassetid://5012539403",
+                    ImageColor3 = themes.TextColor,
+                    SliceCenter = Rect.new(2, 2, 298, 298)
+                })
+            }),
+            utility:Create("ImageLabel", {
+                Name = "List",
                 BackgroundTransparency = 1,
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 4, 0, 4),
-                Size = UDim2.new(1, -8, 1, -8),
-                CanvasPosition = Vector2.new(0, 28),
-                CanvasSize = UDim2.new(0, 0, 0, 120),
+                Size = UDim2.new(1, 0, 1, -34),
                 ZIndex = 2,
-                ScrollBarThickness = 3,
-                ScrollBarImageColor3 = themes.DarkContrast
+                Image = "rbxassetid://5028857472",
+                ImageColor3 = themes.Background,
+                ScaleType = Enum.ScaleType.Slice,
+                SliceCenter = Rect.new(2, 2, 298, 298)
             }, {
-                utility:Create("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 4)
+                utility:Create("ScrollingFrame", {
+                    Name = "Frame",
+                    Active = true,
+                    BackgroundTransparency = 1,
+                    BorderSizePixel = 0,
+                    Position = UDim2.new(0, 4, 0, 4),
+                    Size = UDim2.new(1, -8, 1, -8),
+                    CanvasPosition = Vector2.new(0, 28),
+                    CanvasSize = UDim2.new(0, 0, 0, 120),
+                    ZIndex = 2,
+                    ScrollBarThickness = 3,
+                    ScrollBarImageColor3 = themes.DarkContrast
+                }, {
+                    utility:Create("UIListLayout", {
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        Padding = UDim.new(0, 4)
+                    })
                 })
             })
         })
-    })
     
-    table.insert(self.modules, dropdown)
+        table.insert(self.modules, dropdown)
     
-    local search = dropdown.Search
-    local focused
-    local selectedItems = {}
-
-    local function updateTextBox()
-        local displayText = next(selectedItems) and table.concat(selectedItems, ", ") or title
-        search.TextBox.Text = displayText
-        callback(selectedItems)
-    end
-
-    search.Button.MouseButton1Click:Connect(function()
-        if search.Button.Rotation == 0 then
-            self:updateDropdown(dropdown, nil, list, callback)
-        else
-            self:updateDropdown(dropdown, nil, nil, callback)
+        local selectedItems = {}
+    
+        local function updateTextBox()
+            local selectedText = table.concat(selectedItems, ", ")
+            dropdown.Search.TextBox.Text = selectedText == "" and title or selectedText
         end
-    end)
-
-    search.TextBox.Focused:Connect(function()
-        if search.Button.Rotation == 0 then
-            self:updateDropdown(dropdown, nil, list, callback)
-        end
-        focused = true
-    end)
-
-    search.Text box.FocusLost:Connect(function()
-        focused = false
-    end)
-
-    for _, item in ipairs(list) do
-        local itemButton = utility:Create("TextButton", {
-            Name = item,
-            BackgroundTransparency = 0,
-            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-            Text = item,
-            Font = Enum.Font.Gotham,
-            TextColor3 = Color3.fromRGB(0, 0, 0),
-            TextSize = 12,
-            AutoButtonColor = false,
-            Size = UDim2.new(1, 0, 0, 30)
-        })
-
-        itemButton.Parent = dropdown.List.Frame
-
-        itemButton.MouseButton1Click:Connect(function()
-            if selectedItems[item] then
-                selectedItems[item] = nil
-            else
-                selectedItems[item] = true
+    
+        local function toggleDropdown()
+            local isOpen = dropdown.List.Visible
+            dropdown.List.Visible = not isOpen
+            dropdown.Search.Button.Rotation = isOpen and 0 or 180
+            if not isOpen then
+                self:updateDropdown(dropdown, nil, list, function(item)
+                    if selectedItems[item] then
+                        selectedItems[item] = nil
+                    else
+                        selectedItems[item] = item
+                    end
+                    updateTextBox()
+                    if callback then
+                        callback(selectedItems)
+                    end
+                end)
             end
-            updateTextBox()
-        end)
-    end
-
-    updateTextBox()
+        end
     
-    return dropdown
-end
+        dropdown.List.Visible = false
+        dropdown.Search.Button.MouseButton1Click:Connect(toggleDropdown)
+    
+        return dropdown
+    end    
 
     function section:removeDropdown(dropdown)
         for i, module in pairs(self.modules) do
