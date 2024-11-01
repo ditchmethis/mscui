@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, added btn, sliders, etc. removals.
+-- much love <3, atease
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -1920,11 +1920,11 @@ end
 		end)
 		
 		return dropdown
-	end
+	end    
 
-    function section:addMultiDropdown(title, list, callback)
+    function section:addDropdownSelection(title, list, callback)
         local dropdown = utility:Create("Frame", {
-            Name = "MultiDropdown",
+            Name = "DropdownSelection",
             Parent = self.container,
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 30),
@@ -1958,7 +1958,7 @@ end
                     Text = title,
                     TextColor3 = themes.TextColor,
                     TextSize = 12,
-                    TextTransparency = 0.10000000149012,
+                    TextTransparency = 0.1,
                     TextXAlignment = Enum.TextXAlignment.Left
                 }),
                 utility:Create("ImageButton", {
@@ -2005,100 +2005,35 @@ end
                 })
             })
         })
-        
-        table.insert(self.modules, dropdown)
-        --self:Resize()
-        
-        local search = dropdown.Search
-        local focused
+    
         local selectedItems = {}
-        
-        list = list or {}
-        
+    
+        local function updateSelection(item)
+            selectedItems[item] = not selectedItems[item]
+            local selectedList = {}
+            for k in pairs(selectedItems) do
+                table.insert(selectedList, k)
+            end
+            if callback then
+                callback(selectedList)
+            end
+        end
+    
+        table.insert(self.modules, dropdown)
+    
+        search = dropdown.Search
         search.Button.MouseButton1Click:Connect(function()
             if search.Button.Rotation == 0 then
-                self:updateDropdown(dropdown, nil, list, callback)
+                self:updateDropdown(dropdown, nil, list, function(item)
+                    updateSelection(item)
+                end)
             else
                 self:updateDropdown(dropdown, nil, nil, callback)
             end
         end)
-        
-        search.TextBox.Focused:Connect(function()
-            if search.Button.Rotation == 0 then
-                self:updateDropdown(dropdown, nil, list, callback)
-            end
-            
-            focused = true
-        end)
-        
-        search.TextBox.FocusLost:Connect(function()
-            focused = false
-        end)
-        
-        search.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-            if focused then
-                local list = utility:Sort(search.TextBox.Text, list)
-                list = #list ~= 0 and list 
-                
-                self:updateDropdown(dropdown, nil, list, callback)
-            end
-        end)
-        
-        dropdown:GetPropertyChangedSignal("Size"):Connect(function()
-            self:Resize()
-        end)
-        
-        local function updateSelectedItems(value)
-            if selectedItems[value] then
-                selectedItems[value] = nil
-            else
-                selectedItems[value] = true
-            end
-            
-            local selectedTitles = {}
-            for item, _ in pairs(selectedItems) do
-                table.insert(selectedTitles, item)
-            end
-            search.TextBox.Text = table.concat(selectedTitles, ", ")
-            
-            if callback then
-                callback(selectedItems)
-            end
-        end
-        
-        for i, value in pairs(list or {}) do
-            local button = utility:Create("ImageButton", {
-                Parent = dropdown.List.Frame,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2.new(1, 0, 0, 30),
-                ZIndex = 2,
-                Image = "rbxassetid://5028857472",
-                ImageColor3 = themes.DarkContrast,
-                ScaleType = Enum.ScaleType.Slice,
-                SliceCenter = Rect.new(2, 2, 298, 298)
-            }, {
-                utility:Create("TextLabel", {
-                    BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 10, 0, 0),
-                    Size = UDim2.new(1, -10, 1, 0),
-                    ZIndex = 3,
-                    Font = Enum.Font.Gotham,
-                    Text = value,
-                    TextColor3 = themes.TextColor,
-                    TextSize = 12,
-                    TextXAlignment = "Left",
-                    TextTransparency = 0.10000000149012
-                })
-            })
-            
-            button.MouseButton1Click:Connect(function()
-                updateSelectedItems(value)
-            end)
-        end
-        
+    
         return dropdown
-    end
+    end    
 
     function section:removeDropdown(dropdown)
         for i, module in pairs(self.modules) do
