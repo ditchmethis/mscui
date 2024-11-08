@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, added btn, sliders, etc. removals.
+-- much love <3, fixed scrolling canvas
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -174,41 +174,64 @@ do
     end
     
     function utility:DraggingEnabled(frame, parent)
-        parent = parent or frame
-        
-        local dragging = false
-        local dragInput, mousePos, framePos
-        
-        frame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging = true
-                mousePos = input.Position
-                framePos = parent.Position
-                
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        dragging = false
-                    end
-                end)
-            end
-        end)
-        
-        frame.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement then
-                dragInput = input
-            end
-        end)
-        
-        input.InputChanged:Connect(function(input)
-            if input == dragInput and dragging then
-                utility:Tween(parent, {Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y)}, 0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
-            end
-        end)
-    end
-    
-    function utility:DraggingEnded(callback)
-        table.insert(self.ended, callback)
-    end
+		parent = parent or frame
+		
+		local dragging = false
+		local dragInput, touchInput, mousePos, framePos
+		
+		local function dragstart(input)
+			dragging = true
+			mousePos = input.Position
+			framePos = parent.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	
+		local function updateframe(input)
+			if dragging then
+				utility:Tween(parent, {Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y)}, 0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			end
+		end
+	
+		frame.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 then
+				dragstart(input)
+			end
+		end)
+		
+		frame.InputChanged:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseMovement then
+				dragInput = input
+			end
+		end)
+
+		frame.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.Touch then
+				dragstart(input)
+				touchInput = input
+			end
+		end)
+	
+		frame.InputChanged:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.Touch then
+				dragInput = input
+			end
+		end)
+	
+		input.InputChanged:Connect(function(input)
+			if input == dragInput and (dragging or (touchInput and touchInput.UserInputState == Enum.UserInputState.Begin)) then
+				updateframe(input)
+			end
+		end)
+	end
+	
+	function utility:DraggingEnded(callback)
+		table.insert(self.ended, callback)
+	end
 end
 
 -- classes
@@ -1464,7 +1487,7 @@ do
 			end
 		end
 		
-		for i, container in pairs(tab.Container.Inputs:GetChildren()) do -- i know what you are about to say, so shut up
+		for i, container in pairs(tab.Container.Inputs:GetChildren()) do
 			if container:IsA("ImageLabel") then
 				local textbox = container.Textbox
 				local focused
@@ -1971,7 +1994,8 @@ end
 					ZIndex = 3,
 					Image = "rbxassetid://5012539403",
 					ImageColor3 = themes.TextColor,
-					SliceCenter = Rect.new(2, 2, 298, 298)
+					SliceCenter = Rect.new(2, 2, 298, 298),
+					Rotation = 0
 				})
 			}),
 			utility:Create("ImageLabel", {
@@ -2009,20 +2033,26 @@ end
 		local search = dropdown.Search
 		local focused
 		local selectedItems = {}
+		local expanded = false
 		
 		list = list or {}
 		
 		search.Button.MouseButton1Click:Connect(function()
-			if search.Button.Rotation == 0 then
+			expanded = not expanded
+			if expanded then
 				self:updateMultiDropdown(dropdown, list, callback, selectedItems)
+				utility:Tween(search.Button, {Rotation = 180}, 0.3)
 			else
 				self:updateMultiDropdown(dropdown, nil, callback, selectedItems)
+				utility:Tween(search.Button, {Rotation = 0}, 0.3)
 			end
 		end)
 		
 		search.TextBox.Focused:Connect(function()
-			if search.Button.Rotation == 0 then
+			if not expanded then
+				expanded = true
 				self:updateMultiDropdown(dropdown, list, callback, selectedItems)
+				utility:Tween(search.Button, {Rotation = 180}, 0.3)
 			end
 			
 			focused = true
@@ -2047,103 +2077,6 @@ end
 		
 		return dropdown
 	end
-
-    function section:updateMultiDropdown(dropdown, list, callback, selectedItems, title)
-        dropdown = self:getModule(dropdown)
-        local frame = dropdown.List.Frame
-        frame:ClearAllChildren()
-
-        if title then
-			dropdown.Search.TextBox.Text = title
-		end
-        
-        utility:Create("UIListLayout", {
-            Parent = frame,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 4)
-        })
-        
-        local entries = 0
-        utility:Pop(dropdown.Search, 10)
-        
-        list = list or {}
-        for i, value in pairs(list) do
-            local button = utility:Create("ImageButton", {
-                Parent = frame,
-                Name = value,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2.new(1, 0, 0, 30),
-                ZIndex = 2,
-                Image = "rbxassetid://5028857472",
-                ImageColor3 = themes.DarkContrast,
-                ScaleType = Enum.ScaleType.Slice,
-                SliceCenter = Rect.new(2, 2, 298, 298)
-            })
-            
-            local title = utility:Create("TextLabel", {
-                Parent = button,
-                Name = "Title",
-                BackgroundTransparency = 1,
-                Size = UDim2.new(1, -10, 1, 0),
-                Position = UDim2.new(0, 10, 0, 0),
-                Font = Enum.Font.Gotham,
-                Text = tostring(value),
-                TextColor3 = themes.TextColor,
-                TextSize = 12,
-                TextTransparency = selectedItems[value] and 0 or 0.5,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 3
-            })
-            
-            button.MouseButton1Click:Connect(function()
-                selectedItems[value] = not selectedItems[value]
-                title.TextTransparency = selectedItems[value] and 0 or 0.5
-                
-                local text = ""
-                local selected = {}
-                for item, enabled in pairs(selectedItems) do
-                    if enabled then
-                        table.insert(selected, item)
-                        text = text .. tostring(item) .. ", "
-                    end
-                end
-                
-                if text ~= "" then
-                    text = text:sub(1, -3)
-                    dropdown.Search.TextBox.Text = text
-                else
-                    dropdown.Search.TextBox.Text = title
-                end
-                
-                if callback then
-                    callback(selected)
-                end
-                
-                utility:Pop(dropdown.Search, 10)
-            end)
-            
-            entries = entries + 1
-        end
-        
-        local height = (entries == 0 and 30) or math.clamp(entries, 0, 3) * 34 + 38
-        utility:Tween(dropdown, {Size = UDim2.new(1, 0, 0, height)}, 0.3)
-        utility:Tween(dropdown.Search.Button, {Rotation = list and 180 or 0}, 0.3)
-        
-        if entries > 3 then
-            for i, button in pairs(frame:GetChildren()) do
-                if button:IsA("ImageButton") then
-                    button.Size = UDim2.new(1, -6, 0, 30)
-                end
-            end
-            
-            frame.CanvasSize = UDim2.new(0, 0, 0, (entries * 34) - 4)
-            frame.ScrollBarImageTransparency = 0
-        else
-            frame.CanvasSize = UDim2.new(0, 0, 0, 0)
-            frame.ScrollBarImageTransparency = 1
-        end
-    end
 
     function section:removeDropdown(dropdown)
         for i, module in pairs(self.modules) do
@@ -2257,12 +2190,14 @@ end
 		for i, section in pairs(self.sections) do
 			size = size + section.container.Parent.AbsoluteSize.Y + padding
 		end
-		
-		self.container.CanvasSize = UDim2.new(0, 0, 0, size)
+	
 		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
 		
 		if scroll then
-			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.8, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			local t = utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.8, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+			if t then
+				self.container.CanvasSize = UDim2.new(0, 0, 0, size)
+			end
 		end
 	end
 	
@@ -2515,6 +2450,102 @@ end
 			frame.ScrollBarImageTransparency = 1
 		end
 	end
+
+    function section:updateMultiDropdown(dropdown, list, callback, selectedItems, title)
+        dropdown = self:getModule(dropdown)
+        local frame = dropdown.List.Frame
+        frame:ClearAllChildren()
+
+        if title then
+			dropdown.Search.TextBox.Text = title
+		end
+        
+        utility:Create("UIListLayout", {
+            Parent = frame,
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, 4)
+        })
+        
+        local entries = 0
+        utility:Pop(dropdown.Search, 10)
+        
+        list = list or {}
+        for i, value in pairs(list) do
+            local button = utility:Create("ImageButton", {
+                Parent = frame,
+                Name = value,
+                BackgroundTransparency = 1,
+                BorderSizePixel = 0,
+                Size = UDim2.new(1, 0, 0, 30),
+                ZIndex = 2,
+                Image = "rbxassetid://5028857472",
+                ImageColor3 = themes.DarkContrast,
+                ScaleType = Enum.ScaleType.Slice,
+                SliceCenter = Rect.new(2, 2, 298, 298)
+            })
+            
+            local title = utility:Create("TextLabel", {
+                Parent = button,
+                Name = "Title",
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, -10, 1, 0),
+                Position = UDim2.new(0, 10, 0, 0),
+                Font = Enum.Font.Gotham,
+                Text = tostring(value),
+                TextColor3 = themes.TextColor,
+                TextSize = 12,
+                TextTransparency = selectedItems[value] and 0 or 0.5,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 3
+            })
+            
+            button.MouseButton1Click:Connect(function()
+                selectedItems[value] = not selectedItems[value]
+                title.TextTransparency = selectedItems[value] and 0 or 0.5
+                
+                local text = ""
+                local selected = {}
+                for item, enabled in pairs(selectedItems) do
+                    if enabled then
+                        table.insert(selected, item)
+                        text = text .. tostring(item) .. ", "
+                    end
+                end
+                
+                if text ~= "" then
+                    text = text:sub(1, -3)
+                    dropdown.Search.TextBox.Text = text
+                else
+                    dropdown.Search.TextBox.Text = title
+                end
+                
+                if callback then
+                    callback(selected)
+                end
+                
+                utility:Pop(dropdown.Search, 10)
+            end)
+            
+            entries = entries + 1
+        end
+        
+        local height = (entries == 0 and 30) or math.clamp(entries, 0, 3) * 34 + 38
+        utility:Tween(dropdown, {Size = UDim2.new(1, 0, 0, list and height or 30)}, 0.3)
+        
+        if entries > 3 then
+            for i, button in pairs(frame:GetChildren()) do
+                if button:IsA("ImageButton") then
+                    button.Size = UDim2.new(1, -6, 0, 30)
+                end
+            end
+            
+            frame.CanvasSize = UDim2.new(0, 0, 0, (entries * 34) - 4)
+            frame.ScrollBarImageTransparency = 0
+        else
+            frame.CanvasSize = UDim2.new(0, 0, 0, 0)
+            frame.ScrollBarImageTransparency = 1
+        end
+    end
 
 end
 
