@@ -1,5 +1,5 @@
 -- venyx ui lib, modified by myzsyn 
--- much love <3, drag test
+-- much love <3, added multi-select dropdowns (i need some sleep)
 
 local cloneref = cloneref or function(...) return ... end
 
@@ -174,64 +174,41 @@ do
     end
     
     function utility:DraggingEnabled(frame, parent)
-		parent = parent or frame
-		
-		local dragging = false
-		local dragInput, touchInput, mousePos, framePos
-		
-		local function dragstart(input)
-			dragging = true
-			mousePos = input.Position
-			framePos = parent.Position
-	
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	
-		local function updateframe(input)
-			if dragging then
-				utility:Tween(parent, {Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y)}, 0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
-			end
-		end
-	
-		frame.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
-				dragstart(input)
-			end
-		end)
-		
-		frame.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
-				dragInput = input
-			end
-		end)
-
-		frame.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.Touch then
-				dragstart(input)
-				touchInput = input
-			end
-		end)
-	
-		frame.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.Touch then
-				dragInput = input
-			end
-		end)
-	
-		input.InputChanged:Connect(function(input)
-			if input == dragInput and (dragging or (touchInput and touchInput.UserInputState == Enum.UserInputState.Begin)) then
-				updateframe(input)
-			end
-		end)
-	end
-	
-	function utility:DraggingEnded(callback)
-		table.insert(self.ended, callback)
-	end
+        parent = parent or frame
+        
+        local dragging = false
+        local dragInput, mousePos, framePos
+        
+        frame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                mousePos = input.Position
+                framePos = parent.Position
+                
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+        
+        frame.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                dragInput = input
+            end
+        end)
+        
+        input.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then
+                utility:Tween(parent, {Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + (input.Position - mousePos).X, framePos.Y.Scale, framePos.Y.Offset + (input.Position - mousePos).Y)}, 0.3, Enum.EasingStyle.Circular, Enum.EasingDirection.Out)
+            end
+        end)
+    end
+    
+    function utility:DraggingEnded(callback)
+        table.insert(self.ended, callback)
+    end
 end
 
 -- classes
@@ -2510,11 +2487,11 @@ end
                     end
                 end
                 
-                if text ~= "" then
+                if text ~= "" or text ~= nil then
                     text = text:sub(1, -3)
                     dropdown.Search.TextBox.Text = text
                 else
-                    dropdown.Search.TextBox.Text = title
+                    dropdown.Search.TextBox.Text = "None"
                 end
                 
                 if callback then
